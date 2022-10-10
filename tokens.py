@@ -1,47 +1,28 @@
-from nodes import NumericOperator, Expression
 from tokenizer import SimpleExplcitToken, MultipleExplicitToken, Token
 
 
-class Add(SimpleExplcitToken, NumericOperator):
+class Add(SimpleExplcitToken):
     name = '+'
 
-    def process(self, left, right):
-        return left + right
 
-
-class Sub(SimpleExplcitToken, NumericOperator):
+class Sub(SimpleExplcitToken):
     name = '-'
 
-    def process(self, left, right):
-        return left - right
 
-
-class Mul(SimpleExplcitToken, NumericOperator):
+class Mul(SimpleExplcitToken):
     name = '*'
 
-    def process(self, left, right):
-        return left * right
 
-
-class Div(SimpleExplcitToken, NumericOperator):
+class Div(SimpleExplcitToken):
     name = '/'
 
-    def process(self, left, right):
-        return left / right
 
-
-class Pow(MultipleExplicitToken, NumericOperator):
+class Pow(MultipleExplicitToken):
     names = ('**', '^')
 
-    def process(self, left, right):
-        return left ** right
 
-
-class Mod(MultipleExplicitToken, NumericOperator):
+class Mod(MultipleExplicitToken):
     names = ("mod", "%")
-
-    def process(self, left, right):
-        return left % right
 
 
 class OpeningParenthese(SimpleExplcitToken):
@@ -52,9 +33,7 @@ class ClosingParenthese(SimpleExplcitToken):
     name = ")"
 
 
-class Number(Token, Expression):
-    def evaluate(self):
-        return float(self.symbols)
+class Number(Token):
 
     @classmethod
     def is_candidate(cls, symbols: str) -> bool:
