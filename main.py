@@ -1,14 +1,13 @@
 from pprint import pprint
 
-from tokenizer import parser, SimpleExplcitToken, MultipleExplicitToken, Token
-import tokenizer
-from tokens import Number, Add, Sub, Mul, Div, Pow, Mod, OpeningParenthese, ClosingParenthese
+import tokens
+from parser.tokens import Number, Add, Sub, Mul, Div, Pow, Mod, OpeningParenthese, ClosingParenthese
 
 
 def main():
     expr = input("> ")
 
-    result = tokenizer.parse(expr, token_kinds=[
+    result = tokens.tokenize(expr, token_kinds=[
         Number,
         Add,
         Sub,

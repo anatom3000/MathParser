@@ -22,24 +22,28 @@ class Token(ABC):
         return f"{self.__class__.__name__}<\"{self.symbols}\">"
 
 
-class SimpleExplcitToken(Token, ABC):
+class SimpleExplcitToken(Token):
     name: str
 
     @classmethod
     def is_candidate(cls, symbols: str) -> bool:
-        return len(symbols) <= len(cls.name) and cls.name[:len(symbols)] == symbols
+        return len(symbols) <= len(
+            cls.name) and cls.name[:len(symbols)] == symbols
 
     @classmethod
     def is_valid(cls, symbols: str) -> bool:
         return symbols == cls.name
 
 
-class MultipleExplicitToken(Token, ABC):
+class MultipleExplicitToken(Token):
     names: Sequence[str]
 
     @classmethod
     def is_candidate(cls, symbols: str) -> bool:
-        return any([len(symbols) <= len(name) and name[:len(symbols)] == symbols for name in cls.names])
+        return any([
+            len(symbols) <= len(name) and name[:len(symbols)] == symbols
+            for name in cls.names
+        ])
 
     @classmethod
     def is_valid(cls, symbols: str) -> bool:
@@ -55,6 +59,3 @@ class Unknown(Token):
     @classmethod
     def is_valid(cls, symbols: str) -> bool:
         return True
-
-
-

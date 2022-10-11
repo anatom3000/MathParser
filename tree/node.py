@@ -10,7 +10,8 @@ class Node(ABC):
 
 
 class BinaryOperatorNode(Node):
-    def __init__(self, left: Node, right: Node):
+    def __init__(self, token: Token, left: Node, right: Node):
+        self.token = token
         self.left = left
         self.right = right
 
@@ -24,7 +25,7 @@ class ValueNode(Node):
     # self.evaluate() left to implement by subclassing
 
 
-class UnaryOperatorNode(Node):
+class ParentNode(Node):
     def __init__(self, node: Node):
         self.node = node
 
@@ -32,4 +33,4 @@ class UnaryOperatorNode(Node):
         return self.node.evaluate()
 
 
-Tree = UnaryOperator
+Tree = ParentNode

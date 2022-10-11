@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 
-from .kind import Token, Unknown
+from .token import Token, Unknown
 
 TokenKinds = Sequence[Token.__class__]
 
@@ -9,7 +9,7 @@ class ParsingError(Exception):
     pass
 
 
-def parse_first(expression: str, token_kinds: TokenKinds) -> Token:
+def first_token(expression: str, token_kinds: TokenKinds) -> Token:
     last_char = 1
     previous_candidates = None
     candidates = [kind for kind in token_kinds if kind.is_candidate(expression[:last_char])]  # you can't get the length of a filter object :/
@@ -53,13 +53,13 @@ def parse_first(expression: str, token_kinds: TokenKinds) -> Token:
             candidates = [kind for kind in token_kinds if kind.is_candidate(expression[:last_char])]
 
 
-def parse(expression: str, token_kinds: TokenKinds, *, raise_on_unknown=True, ignore_whitespaces=True):
+def tokenize(expression: str, token_kinds: TokenKinds, *, raise_on_unknown=True, ignore_whitespaces=True) -> Sequence[Token]:
     if ignore_whitespaces:
         expression = ''.join(expression.split())
 
     tokens = []
     while len(expression) != 0:
-        token = parse_first(expression, token_kinds)
+        token = first_token(expression, token_kinds)
 
         is_unknown = isinstance(token, Unknown)
 

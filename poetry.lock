@@ -1,0 +1,15 @@
+[[package]]
+name = "tokenizer"
+version = "3.4.2"
+description = "A tokenizer for Icelandic text"
+category = "main"
+optional = false
+python-versions = "*"
+
+[metadata]
+lock-version = "1.1"
+python-versions = "^3.8"
+content-hash = "5db05acfc24221416f1aa80dba65f7cf6067c7319475b733cbfa4db60ab23898"
+
+[metadata.files]
+tokenizer = []
