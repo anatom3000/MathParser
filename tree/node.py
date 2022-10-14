@@ -10,7 +10,8 @@ class Node(ABC):
 
 
 class BinaryOperatorNode(Node, ABC):
-    def __init__(self, left: Node, right: Node):
+    def __init__(self, token: Token, left: Node, right: Node):
+        self.token = token
         self.left = left
         self.right = right
 
