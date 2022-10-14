@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from tokenizer import Token
+from tokens import Token
 
 
 class Node(ABC):
@@ -25,7 +25,6 @@ class ValueNode(Node, ABC):
     def __init__(self, token: Token):
         self.token = token
 
-    # self.evaluate() left to implement by subclassing
     # self.evaluate() left to implement by subclassing
     # should be something like
     # def evaluate(self):

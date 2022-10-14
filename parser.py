@@ -1,7 +1,5 @@
 from tokens import SimpleExplcitToken, MultipleExplicitToken, Token
 
-from collections.abc import Sequence
-
 
 class Add(SimpleExplcitToken):
     name = '+'
