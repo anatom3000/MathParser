@@ -1,8 +1,7 @@
 from pprint import pprint
 
-from tokenizer import parser, SimpleExplcitToken, MultipleExplicitToken, Token
 import tokenizer
-from tokens import Number, Add, Sub, Mul, Div, Pow, Mod, OpeningParenthese, ClosingParenthese
+from tokens import Number, Add, Sub, Mul, Div, Pow, Mod, OpeningParenthese, ClosingParenthese, Name
 
 
 def main():
@@ -17,7 +16,8 @@ def main():
         Pow,
         Mod,
         OpeningParenthese,
-        ClosingParenthese
+        ClosingParenthese,
+        Name,
     ], raise_on_unknown=False)
 
     pprint(result, underscore_numbers=True)

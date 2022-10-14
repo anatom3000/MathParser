@@ -25,10 +25,8 @@ def parse_first(expression: str, token_kinds: TokenKinds) -> Token:
                 kind_number = len(valid_kinds)
                 if kind_number == 0:
                     return Unknown(previous_part)
-                elif kind_number == 1:
-                    return valid_kinds[0](previous_part)
                 else:
-                    raise ParsingError(f"too many candidates {valid_kinds} for \"{previous_part}\"")
+                    return valid_kinds[0](previous_part)
 
             else:
                 return Unknown(expression[:last_char])
@@ -49,8 +47,12 @@ def parse_first(expression: str, token_kinds: TokenKinds) -> Token:
 
         else:
             last_char += 1
-            previous_candidates = candidates[:]
-            candidates = [kind for kind in token_kinds if kind.is_candidate(expression[:last_char])]
+            if last_char > len(expression):
+                previous_candidates = candidates[:]
+                candidates = []  # to trigger next if len(candidates) == 0 in loop
+            else:
+                previous_candidates = candidates[:]
+                candidates = [kind for kind in token_kinds if kind.is_candidate(expression[:last_char])]
 
 
 def parse(expression: str, token_kinds: TokenKinds, *, raise_on_unknown=True, ignore_whitespaces=True):

@@ -37,8 +37,31 @@ class Number(Token):
 
     @classmethod
     def is_candidate(cls, symbols: str) -> bool:
-        return all(map(lambda x: x in "0123456789", symbols))
+        if symbols[0] in "+-":
+            return False
+
+        try:
+            float(symbols + "0")
+            return True
+        except ValueError:
+            return False
 
     @classmethod
     def is_valid(cls, symbols: str) -> bool:
-        return all(map(lambda x: x in "0123456789", symbols))
+        try:
+            float(symbols)
+            return True
+
+        except ValueError:
+            return False
+
+
+class Name(Token):
+
+    @classmethod
+    def is_candidate(cls, symbols: str) -> bool:
+        return symbols.isalnum() and symbols[0] not in "0123456789"
+
+    @classmethod
+    def is_valid(cls, symbols: str) -> bool:
+        return symbols.isalnum() and symbols[0] not in "0123456789"
