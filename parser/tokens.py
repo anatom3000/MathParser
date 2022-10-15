@@ -65,8 +65,3 @@ class Name(Token):
     @classmethod
     def is_valid(cls, symbols: str) -> bool:
         return symbols.isalnum() and symbols[0] not in "0123456789"
-
-
-class TreeBuilderError(Exception):
-    pass
-
