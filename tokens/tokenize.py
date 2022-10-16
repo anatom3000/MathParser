@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 
-from .token import Token, Unknown
+from .kind import Token, Unknown
 
 TokenKinds = Sequence[Token.__class__]
 
@@ -76,3 +76,5 @@ def tokenize(expression: str, token_kinds: TokenKinds, *, raise_on_unknown=True,
         expression = expression[len(token.symbols):]
 
     return tokens
+
+__all__ = ["tokenize"]

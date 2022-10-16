@@ -1,17 +1,17 @@
 from abc import ABC, abstractmethod
 
-from tokens import Token
-
 
 class Node(ABC):
     @abstractmethod
     def evaluate(self):
         pass
 
+    def reduce(self):
+        return self.evaluate()
+
 
 class BinaryOperatorNode(Node, ABC):
-    def __init__(self, token: Token, left: Node, right: Node):
-        self.token = token
+    def __init__(self, left: Node, right: Node):
         self.left = left
         self.right = right
 
@@ -19,16 +19,6 @@ class BinaryOperatorNode(Node, ABC):
     # should be something like
     # def evaluate(self):
     #     return self.left + self.right
-
-
-class ValueNode(Node, ABC):
-    def __init__(self, token: Token):
-        self.token = token
-
-    # self.evaluate() left to implement by subclassing
-    # should be something like
-    # def evaluate(self):
-    #     return float(self.token.symbols)
 
 
 class UnaryOperatorNode(Node, ABC):
