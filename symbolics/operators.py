@@ -1,6 +1,6 @@
 from abc import ABC
 
-from symbolics.nodes import Node, BinaryOperatorNode
+from symbolics.nodes import Node, BinaryOperatorNode, EvaluateError
 
 
 class NodeWithOperatorSupport(Node, ABC):
@@ -63,6 +63,21 @@ class Value(NodeWithOperatorSupport):
 
     def __repr__(self):
         return repr(self.value)
+
+
+class Variable(NodeWithOperatorSupport):
+
+    def __init__(self, name: str):
+        self.name = name
+
+    def evaluate(self):
+        raise EvaluateError("can't evaluate a variable")
+
+    def reduce(self):
+        return self
+
+    def __repr__(self):
+        return self.name
 
 
 class Add(ReduceableBinaryOperator, NodeWithOperatorSupport):

@@ -1,6 +1,10 @@
 from abc import ABC, abstractmethod
 
 
+class EvaluateError(ValueError):
+    pass
+
+
 class Node(ABC):
     @abstractmethod
     def evaluate(self):
