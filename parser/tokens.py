@@ -33,7 +33,7 @@ class ClosingParenthese(SimpleExplcitToken):
     name = ")"
 
 
-class Number(Token):
+class Num(Token):
 
     @classmethod
     def is_candidate(cls, symbols: str) -> bool:

@@ -5,7 +5,7 @@ from .kind import Token, Unknown
 TokenKinds = Sequence[Token.__class__]
 
 
-class ParsingError(Exception):
+class TokenizingError(Exception):
     pass
 
 
@@ -66,7 +66,7 @@ def tokenize(expression: str, token_kinds: TokenKinds, *, raise_on_unknown=True,
         is_unknown = isinstance(token, Unknown)
 
         if raise_on_unknown and is_unknown:
-            raise ParsingError(f"invalid expression \"{token.symbols}\" ")
+            raise TokenizingError(f"invalid expression \"{token.symbols}\" ")
 
         if len(tokens) != 0 and is_unknown and isinstance(tokens[-1], Unknown):
             tokens[-1] = Unknown(tokens[-1].symbols + token.symbols)
