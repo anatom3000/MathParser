@@ -8,7 +8,7 @@ from parser.tokens import Num, Add, Sub, Mul, Div, Pow, Mod, OpeningParenthese, 
 def main():
     expr = input("> ")
 
-    result = tokens.tokenize(expr, token_kinds=[
+    result = parser.parse(tokens.tokenize(expr, token_kinds=[
         Num,
         Add,
         Sub,
@@ -19,9 +19,9 @@ def main():
         OpeningParenthese,
         ClosingParenthese,
         Name,
-    ], raise_on_unknown=False)
-    pprint(result)
-    pprint(parser.parse(result))
+    ], raise_on_unknown=False))
+    # pprint(result)
+    print(f"{result} = {result.evaluate()}")
 
 if __name__ == '__main__':
     main()

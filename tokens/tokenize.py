@@ -1,4 +1,4 @@
-from collections.abc import Sequence
+from collections.abc import Sequence, MutableSequence
 
 from .kind import Token, Unknown
 
@@ -12,13 +12,14 @@ class TokenizingError(Exception):
 def first_token(expression: str, token_kinds: TokenKinds) -> Token:
     last_char = 1
     previous_candidates = None
-    candidates = [kind for kind in token_kinds if kind.is_candidate(expression[:last_char])]  # you can't get the length of a filter object :/
+    candidates = [kind for kind in token_kinds if
+                  kind.is_candidate(expression[:last_char])]  # you can't get the length of a filter object :/
 
     while True:
         # print(f"\nCandidates for <{expression[:last_char]}>: {candidates}")
         if len(candidates) == 0:
             if last_char > 1:
-                previous_part = expression[:last_char-1]
+                previous_part = expression[:last_char - 1]
 
                 valid_kinds = [kind for kind in previous_candidates if kind.is_valid(previous_part)]
 
@@ -34,7 +35,7 @@ def first_token(expression: str, token_kinds: TokenKinds) -> Token:
         elif len(candidates) == 1:
             candidate = candidates[0]
 
-            while candidate.is_candidate(expression[:last_char+1]):
+            while candidate.is_candidate(expression[:last_char + 1]):
                 if last_char > len(expression):
                     break
 
@@ -55,7 +56,8 @@ def first_token(expression: str, token_kinds: TokenKinds) -> Token:
                 candidates = [kind for kind in token_kinds if kind.is_candidate(expression[:last_char])]
 
 
-def tokenize(expression: str, token_kinds: TokenKinds, *, raise_on_unknown=True, ignore_whitespaces=True) -> Sequence[Token]:
+def tokenize(expression: str, token_kinds: TokenKinds, *, raise_on_unknown=True, ignore_whitespaces=True) -> MutableSequence[
+        Token]:
     if ignore_whitespaces:
         expression = ''.join(expression.split())
 
@@ -76,5 +78,6 @@ def tokenize(expression: str, token_kinds: TokenKinds, *, raise_on_unknown=True,
         expression = expression[len(token.symbols):]
 
     return tokens
+
 
 __all__ = ["tokenize"]

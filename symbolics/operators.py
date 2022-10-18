@@ -85,7 +85,7 @@ class Add(ReduceableBinaryOperator, NodeWithOperatorSupport):
         return self.left.evaluate() + self.right.evaluate()
 
     def __repr__(self):
-        return f"{repr(self.left)} + {repr(self.right)}"
+        return f"({repr(self.left)} + {repr(self.right)})"
 
 
 class Sub(ReduceableBinaryOperator, NodeWithOperatorSupport):
@@ -93,7 +93,7 @@ class Sub(ReduceableBinaryOperator, NodeWithOperatorSupport):
         return self.left.evaluate() - self.right.evaluate()
 
     def __repr__(self):
-        return f"{repr(self.left)} - {repr(self.right)}"
+        return f"({repr(self.left)} - {repr(self.right)})"
 
 
 class Mul(ReduceableBinaryOperator, NodeWithOperatorSupport):
@@ -101,7 +101,7 @@ class Mul(ReduceableBinaryOperator, NodeWithOperatorSupport):
         return self.left.evaluate() * self.right.evaluate()
 
     def __repr__(self):
-        return f"{repr(self.left)} * {repr(self.right)}"
+        return f"({repr(self.left)} * {repr(self.right)})"
 
 
 class Div(ReduceableBinaryOperator, NodeWithOperatorSupport):
@@ -109,7 +109,7 @@ class Div(ReduceableBinaryOperator, NodeWithOperatorSupport):
         return self.left.evaluate() / self.right.evaluate()
 
     def __repr__(self):
-        return f"{repr(self.left)} / {repr(self.right)}"
+        return f"({repr(self.left)} / {repr(self.right)})"
 
 
 class Pow(ReduceableBinaryOperator, NodeWithOperatorSupport):
@@ -117,7 +117,7 @@ class Pow(ReduceableBinaryOperator, NodeWithOperatorSupport):
         return self.left.evaluate() ** self.right.evaluate()
 
     def __repr__(self):
-        return f"{repr(self.left)} ** {repr(self.right)}"
+        return f"({repr(self.left)} ** {repr(self.right)})"
 
 
 class Mod(ReduceableBinaryOperator, NodeWithOperatorSupport):
@@ -125,4 +125,4 @@ class Mod(ReduceableBinaryOperator, NodeWithOperatorSupport):
         return self.left.evaluate() % self.right.evaluate()
 
     def __repr__(self):
-        return f"{repr(self.left)} % {repr(self.right)}"
+        return f"({repr(self.left)} % {repr(self.right)})"
