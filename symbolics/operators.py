@@ -11,11 +11,15 @@ class NodeWithOperatorSupport(Node, ABC):
         else:
             return self + Value(other)
 
+    __radd__ = __add__
+
     def __sub__(self, other):
         if isinstance(other, Node):
             return Sub(self, other)
         else:
             return self - Value(other)
+
+    __rsub__ = __sub__
 
     def __mul__(self, other):
         if isinstance(other, Node):
@@ -23,11 +27,15 @@ class NodeWithOperatorSupport(Node, ABC):
         else:
             return self * Value(other)
 
+    __rmul__ = __mul__
+
     def __truediv__(self, other):
         if isinstance(other, Node):
             return Div(self, other)
         else:
             return self / Value(other)
+
+    __rtruediv__ = __truediv__
 
     def __pow__(self, other):
         if isinstance(other, Node):
@@ -35,11 +43,15 @@ class NodeWithOperatorSupport(Node, ABC):
         else:
             return self ** Value(other)
 
+    __rpow__ = __pow__
+
     def __mod__(self, other):
         if isinstance(other, Node):
             return Mod(self, other)
         else:
             return self % Value(other)
+
+    __rmod__ = __mod__
 
 
 class ReduceableBinaryOperator(BinaryOperatorNode, ABC):
@@ -54,15 +66,20 @@ class Value(NodeWithOperatorSupport):
 
     def __init__(self, value: float):
         self.value = value
+        print(f"Initiaizing a value: {self.value}")
 
     def evaluate(self):
-        return self.value
 
-    def reduce(self):
-        return self.evaluate()
+        if isinstance(self.value, Node):
+            return self.value.evaluate()
+        else:
+            return self.value
 
     def __repr__(self):
-        return repr(self.value)
+        if (not isinstance(self.value, Node)) and self.value.is_integer():
+            return repr(int(self.value))
+        else:
+            return repr(self.value)
 
 
 class Variable(NodeWithOperatorSupport):
@@ -82,7 +99,7 @@ class Variable(NodeWithOperatorSupport):
 
 class Add(ReduceableBinaryOperator, NodeWithOperatorSupport):
     def evaluate(self):
-        return self.left.evaluate() + self.right.evaluate()
+        return Value(self.left.evaluate() + self.right.evaluate())
 
     def __repr__(self):
         return f"({repr(self.left)} + {repr(self.right)})"
@@ -90,7 +107,7 @@ class Add(ReduceableBinaryOperator, NodeWithOperatorSupport):
 
 class Sub(ReduceableBinaryOperator, NodeWithOperatorSupport):
     def evaluate(self):
-        return self.left.evaluate() - self.right.evaluate()
+        return Value(self.left.evaluate() - self.right.evaluate())
 
     def __repr__(self):
         return f"({repr(self.left)} - {repr(self.right)})"
@@ -98,7 +115,7 @@ class Sub(ReduceableBinaryOperator, NodeWithOperatorSupport):
 
 class Mul(ReduceableBinaryOperator, NodeWithOperatorSupport):
     def evaluate(self):
-        return self.left.evaluate() * self.right.evaluate()
+        return Value(self.left.evaluate() * self.right.evaluate())
 
     def __repr__(self):
         return f"({repr(self.left)} * {repr(self.right)})"
@@ -106,7 +123,7 @@ class Mul(ReduceableBinaryOperator, NodeWithOperatorSupport):
 
 class Div(ReduceableBinaryOperator, NodeWithOperatorSupport):
     def evaluate(self):
-        return self.left.evaluate() / self.right.evaluate()
+        return Value(self.left.evaluate() / self.right.evaluate())
 
     def __repr__(self):
         return f"({repr(self.left)} / {repr(self.right)})"
@@ -114,7 +131,7 @@ class Div(ReduceableBinaryOperator, NodeWithOperatorSupport):
 
 class Pow(ReduceableBinaryOperator, NodeWithOperatorSupport):
     def evaluate(self):
-        return self.left.evaluate() ** self.right.evaluate()
+        return Value(self.left.evaluate() ** self.right.evaluate())
 
     def __repr__(self):
         return f"({repr(self.left)} ** {repr(self.right)})"
@@ -122,7 +139,7 @@ class Pow(ReduceableBinaryOperator, NodeWithOperatorSupport):
 
 class Mod(ReduceableBinaryOperator, NodeWithOperatorSupport):
     def evaluate(self):
-        return self.left.evaluate() % self.right.evaluate()
+        return Value(self.left.evaluate() % self.right.evaluate())
 
     def __repr__(self):
         return f"({repr(self.left)} % {repr(self.right)})"

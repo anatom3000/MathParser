@@ -118,7 +118,8 @@ class OpeningParenthese(SimpleExplcitToken, ToNode):
                                                       enumerate(token_stream))))
         parentheses_levels = {}
         nesting_level = 0
-        for p in opening_parentheses_indexes + closing_parentheses_indexes:
+        for p in sorted(opening_parentheses_indexes + closing_parentheses_indexes):
+
             if p in closing_parentheses_indexes:
                 nesting_level -= 1
 
@@ -127,18 +128,31 @@ class OpeningParenthese(SimpleExplcitToken, ToNode):
             if p in opening_parentheses_indexes:
                 nesting_level += 1
 
+
+        print(f"{parentheses_levels = }")
+
         try:
             last_parenthese = max(parentheses_levels.keys())
         except ValueError:
             last_parenthese = None  # we dont need the variable since next for loop wont occure (parentheses_level empty)
+        index_offset = 0
         for index, level in parentheses_levels.items():
+            index -= index_offset
             if index in opening_parentheses_indexes and level == 0:
                 closing_index = index + 1
+
                 while parentheses_levels.get(closing_index, -1) != 0:
                     closing_index += 1
+
                     if closing_index > last_parenthese:
                         raise parse.ParsingError(f"unmatched '(' at token {index}")
-                token_stream[index:closing_index + 1] = [parse.parse(token_stream[index + 1:closing_index])]
+
+                content = parse.parse_tokens(token_stream[index + 1:closing_index])
+                if content is None:
+                    token_stream[index:closing_index + 1] = []
+                else:
+                    token_stream[index:closing_index + 1] = [content]
+                    index_offset += closing_index - index + 1
 
         return token_stream
 
