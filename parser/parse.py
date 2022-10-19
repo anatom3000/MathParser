@@ -42,7 +42,6 @@ def parse_tokens(token_stream: MutableSequence[Token | Node], token_processors=N
     for op in token_processors:
         token_stream = op.to_node(token_stream)
 
-    print(f"{token_stream}")
     if len(token_stream) == 0:
         return None
 

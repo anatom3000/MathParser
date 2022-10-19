@@ -129,7 +129,6 @@ class OpeningParenthese(SimpleExplcitToken, ToNode):
                 nesting_level += 1
 
 
-        print(f"{parentheses_levels = }")
 
         try:
             last_parenthese = max(parentheses_levels.keys())
