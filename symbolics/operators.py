@@ -66,7 +66,6 @@ class Value(NodeWithOperatorSupport):
 
     def __init__(self, value: float):
         self.value = value
-        print(f"Initiaizing a value: {self.value}")
 
     def evaluate(self):
 
@@ -99,7 +98,7 @@ class Variable(NodeWithOperatorSupport):
 
 class Add(ReduceableBinaryOperator, NodeWithOperatorSupport):
     def evaluate(self):
-        return Value(self.left.evaluate() + self.right.evaluate())
+        return Value(self.left.evaluate() + self.right.evaluate()).evaluate()
 
     def __repr__(self):
         return f"({repr(self.left)} + {repr(self.right)})"
@@ -107,7 +106,7 @@ class Add(ReduceableBinaryOperator, NodeWithOperatorSupport):
 
 class Sub(ReduceableBinaryOperator, NodeWithOperatorSupport):
     def evaluate(self):
-        return Value(self.left.evaluate() - self.right.evaluate())
+        return Value(self.left.evaluate() - self.right.evaluate()).evaluate()
 
     def __repr__(self):
         return f"({repr(self.left)} - {repr(self.right)})"
