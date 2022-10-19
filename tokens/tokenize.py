@@ -56,8 +56,9 @@ def first_token(expression: str, token_kinds: TokenKinds) -> Token:
                 candidates = [kind for kind in token_kinds if kind.is_candidate(expression[:last_char])]
 
 
-def tokenize(expression: str, token_kinds: TokenKinds, *, raise_on_unknown=True, ignore_whitespaces=True) -> MutableSequence[
-        Token]:
+def tokenize(expression: str, token_kinds: TokenKinds, *, raise_on_unknown=True, ignore_whitespaces=True) -> \
+MutableSequence[
+    Token]:
     if ignore_whitespaces:
         expression = ''.join(expression.split())
 

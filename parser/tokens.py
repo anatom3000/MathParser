@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 from collections.abc import MutableSequence
 
+import symbolics.operators as op
 from parser import parse
 from symbolics import BinaryOperatorNode, Node
-import symbolics.operators as op
 from tokens import SimpleExplcitToken, MultipleExplicitToken, Token
 
 
@@ -19,7 +19,6 @@ class BinaryOperatorRightToLeft(ToNode):
 
     @classmethod
     def to_node(cls, token_stream: MutableSequence[Token | Node]) -> MutableSequence[Token | Node]:
-
         operator_indexes = list(map(lambda x: x[0],
                                     filter(lambda x: type(x[1]) == cls,
                                            enumerate(token_stream))))
@@ -127,8 +126,6 @@ class OpeningParenthese(SimpleExplcitToken, ToNode):
 
             if p in opening_parentheses_indexes:
                 nesting_level += 1
-
-
 
         try:
             last_parenthese = max(parentheses_levels.keys())

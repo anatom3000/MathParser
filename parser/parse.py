@@ -5,22 +5,6 @@ from symbolics import Node
 from tokens import Token, tokenize
 from .tokens import Add, Sub, Pow, Num, Mul, Div, Mod, OpeningParenthese, ClosingParenthese, Name
 
-
-class ParsingError(Exception):
-    pass
-
-
-TOKENS_PROCESSORS = [
-    OpeningParenthese,
-    Num,
-    Pow,
-    Mul,
-    Div,
-    Mod,
-    Add,
-    Sub,
-]
-
 TOKENS = [
     Num,
     Add,
@@ -33,6 +17,21 @@ TOKENS = [
     ClosingParenthese,
     Name,
 ]
+
+TOKENS_PROCESSORS = [
+    OpeningParenthese,
+    Num,
+    Pow,
+    Mul,
+    Div,
+    Mod,
+    Add,
+    Sub,
+]
+
+
+class ParsingError(Exception):
+    pass
 
 
 def parse_tokens(token_stream: MutableSequence[Token | Node], token_processors=None) -> Optional[Node]:
