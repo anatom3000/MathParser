@@ -12,7 +12,7 @@ class TokenizingError(Exception):
 
 def first_token(expression: str, token_kinds: TokenKinds) -> Token:
     last_char = 1
-    previous_candidates: TokenKinds
+    previous_candidates: TokenKinds = []
     candidates = [kind for kind in token_kinds if
                   kind.is_candidate(expression[:last_char])]  # you can't get the length of a filter object :/
 
@@ -57,7 +57,8 @@ def first_token(expression: str, token_kinds: TokenKinds) -> Token:
                 candidates = [kind for kind in token_kinds if kind.is_candidate(expression[:last_char])]
 
 
-def tokenize(expression: str, token_kinds: TokenKinds, *, raise_on_unknown: bool = True, ignore_whitespaces: bool = True) \
+def tokenize(expression: str, token_kinds: TokenKinds, *, raise_on_unknown: bool = True,
+             ignore_whitespaces: bool = True) \
         -> MutableSequence[Token]:
     if ignore_whitespaces:
         expression = ''.join(expression.split())

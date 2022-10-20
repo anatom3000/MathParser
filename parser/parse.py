@@ -1,10 +1,10 @@
 from collections.abc import MutableSequence
-from typing import Optional
+from typing import Optional, Type
 
 from symbolics import Node
 from tokens import Token, tokenize
+from .processors import Parentheses, TokenProcessor
 from .tokens import Add, Sub, Pow, Num, Mul, Div, Mod, OpeningParenthese, ClosingParenthese, Name
-from .processors import Parentheses
 
 TOKENS = [
     Num,
@@ -19,7 +19,7 @@ TOKENS = [
     Name,
 ]
 
-TOKENS_PROCESSORS = [
+TOKENS_PROCESSORS: list[Type[TokenProcessor]] = [
     # TODO: implicit multiplication e. g. 2(3+5)
     Parentheses,
     Num,
@@ -38,9 +38,8 @@ class ParsingError(Exception):
 
 
 def parse_tokens(token_stream: MutableSequence[Token | Node]) -> Optional[Node]:
-
     for op in TOKENS_PROCESSORS:
-        token_stream = op.to_node(token_stream)  # type: ignore
+        token_stream = op.to_node(token_stream)
 
     if len(token_stream) == 0:
         return None

@@ -1,9 +1,10 @@
 from abc import abstractmethod, ABC
-from collections.abc import MutableSequence
+from collections.abc import MutableSequence, Iterable
+from itertools import chain
 
-from . import parse, tokens
 from symbolics import Node
 from tokens import Token
+from . import parse, tokens
 
 
 class TokenProcessor(ABC):
@@ -14,6 +15,22 @@ class TokenProcessor(ABC):
 
 
 class Parentheses(TokenProcessor):
+    @staticmethod
+    def get_parenthese_levels(opening_parentheses_indexes: Iterable[int], closing_parentheses_indexes: Iterable[int]) \
+            -> dict[int, int]:
+        levels = {}
+        nesting_level = 0
+        for p in sorted(chain(opening_parentheses_indexes, closing_parentheses_indexes)):
+
+            if p in closing_parentheses_indexes:
+                nesting_level -= 1
+
+            levels[p] = nesting_level
+
+            if p in opening_parentheses_indexes:
+                nesting_level += 1
+
+        return levels
 
     @classmethod
     def to_node(cls, token_stream: MutableSequence[Token | Node]) -> MutableSequence[Token | Node]:
@@ -23,17 +40,8 @@ class Parentheses(TokenProcessor):
         closing_parentheses_indexes = list(map(lambda x: x[0],
                                                filter(lambda x: isinstance(x[1], tokens.ClosingParenthese),
                                                       enumerate(token_stream))))
-        parentheses_levels = {}
-        nesting_level = 0
-        for p in sorted(opening_parentheses_indexes + closing_parentheses_indexes):
 
-            if p in closing_parentheses_indexes:
-                nesting_level -= 1
-
-            parentheses_levels[p] = nesting_level
-
-            if p in opening_parentheses_indexes:
-                nesting_level += 1
+        parentheses_levels = cls.get_parenthese_levels(opening_parentheses_indexes, closing_parentheses_indexes)
 
         try:
             last_parenthese = max(parentheses_levels.keys())
@@ -59,4 +67,3 @@ class Parentheses(TokenProcessor):
                     index_offset += closing_index - index + 1
 
         return token_stream
-
