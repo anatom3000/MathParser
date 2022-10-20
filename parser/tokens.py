@@ -29,6 +29,24 @@ class BinaryOperatorRightToLeft(ToNode):
         return token_stream
 
 
+class BinaryOperatorLeftToRight(ToNode):
+    node: BinaryOperatorNode.__class__
+
+    @classmethod
+    def to_node(cls, token_stream: MutableSequence[Token | Node]) -> MutableSequence[Token | Node]:
+        operator_indexes = list(map(lambda x: x[0],
+                                    filter(lambda x: type(x[1]) == cls,
+                                           enumerate(token_stream))))
+
+        index_offset = 0
+        for i in operator_indexes:
+            i -= index_offset
+            token_stream[i - 1:i + 2] = [cls.node(token_stream[i - 1], token_stream[i + 1])]
+            index_offset += 2
+
+        return token_stream
+
+
 class Num(Token, ToNode):
 
     @classmethod
@@ -80,7 +98,7 @@ class Add(SimpleExplcitToken, BinaryOperatorRightToLeft):
     node = op.Add
 
 
-class Sub(SimpleExplcitToken, BinaryOperatorRightToLeft):
+class Sub(SimpleExplcitToken, BinaryOperatorLeftToRight):
     name = '-'
     node = op.Sub
 

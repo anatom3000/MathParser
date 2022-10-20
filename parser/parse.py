@@ -19,6 +19,7 @@ TOKENS = [
 ]
 
 TOKENS_PROCESSORS = [
+    # TODO: implicit multiplication e. g. 2(3+5)
     OpeningParenthese,
     Num,
     Pow,
