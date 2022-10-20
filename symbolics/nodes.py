@@ -1,4 +1,7 @@
+from __future__ import annotations
 from abc import ABC, abstractmethod
+
+from symbolics import operators
 
 
 class EvaluateError(ValueError):
@@ -7,10 +10,10 @@ class EvaluateError(ValueError):
 
 class Node(ABC):
     @abstractmethod
-    def evaluate(self):
+    def evaluate(self) -> operators.Value:
         pass
 
-    def reduce(self):
+    def reduce(self) -> Node:
         return self.evaluate()
 
 
@@ -33,9 +36,3 @@ class UnaryOperatorNode(Node, ABC):
     # should be something like
     # def evaluate(self):
     #     return -1 * self.node.evaluate()
-
-
-class Tree(UnaryOperatorNode):
-
-    def evaluate(self):
-        return self.node.evaluate()

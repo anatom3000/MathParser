@@ -4,6 +4,7 @@ from typing import Optional
 from symbolics import Node
 from tokens import Token, tokenize
 from .tokens import Add, Sub, Pow, Num, Mul, Div, Mod, OpeningParenthese, ClosingParenthese, Name
+from .processors import Parentheses
 
 TOKENS = [
     Num,
@@ -20,7 +21,7 @@ TOKENS = [
 
 TOKENS_PROCESSORS = [
     # TODO: implicit multiplication e. g. 2(3+5)
-    OpeningParenthese,
+    Parentheses,
     Num,
     Pow,
     Div,
@@ -36,12 +37,10 @@ class ParsingError(Exception):
     pass
 
 
-def parse_tokens(token_stream: MutableSequence[Token | Node], token_processors=None) -> Optional[Node]:
-    if token_processors is None:
-        token_processors = TOKENS_PROCESSORS
+def parse_tokens(token_stream: MutableSequence[Token | Node]) -> Optional[Node]:
 
-    for op in token_processors:
-        token_stream = op.to_node(token_stream)
+    for op in TOKENS_PROCESSORS:
+        token_stream = op.to_node(token_stream)  # type: ignore
 
     if len(token_stream) == 0:
         return None
@@ -58,4 +57,4 @@ def parse_tokens(token_stream: MutableSequence[Token | Node], token_processors=N
 
 
 def parse(expression: str) -> Node:
-    return parse_tokens(tokenize(expression, TOKENS, raise_on_unknown=False, ignore_whitespaces=True))
+    return parse_tokens(tokenize(expression, TOKENS, raise_on_unknown=False, ignore_whitespaces=True))  # type: ignore
