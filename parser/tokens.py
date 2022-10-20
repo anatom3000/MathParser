@@ -118,8 +118,8 @@ class Pow(MultipleExplicitToken, BinaryOperatorRightToLeft):
     node = op.Pow
 
 
-class Mod(MultipleExplicitToken, BinaryOperatorRightToLeft):
-    names = ("mod", "%")
+class Mod(SimpleExplcitToken, BinaryOperatorRightToLeft):
+    name = "%"
     node = op.Mod
 
 

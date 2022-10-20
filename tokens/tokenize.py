@@ -81,4 +81,4 @@ MutableSequence[
     return tokens
 
 
-__all__ = ["tokenize"]
+__all__ = ["tokenize", "TokenKinds"]
