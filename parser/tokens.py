@@ -108,7 +108,7 @@ class Mul(SimpleExplcitToken, BinaryOperatorRightToLeft):
     node = op.Mul
 
 
-class Div(SimpleExplcitToken, BinaryOperatorRightToLeft):
+class Div(SimpleExplcitToken, BinaryOperatorLeftToRight):
     name = '/'
     node = op.Div
 

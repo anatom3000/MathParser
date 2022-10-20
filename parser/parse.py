@@ -23,11 +23,12 @@ TOKENS_PROCESSORS = [
     OpeningParenthese,
     Num,
     Pow,
-    Mul,
     Div,
+    Mul,
     Mod,
-    Add,
     Sub,
+    Add,
+
 ]
 
 
