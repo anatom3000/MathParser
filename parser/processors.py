@@ -6,14 +6,14 @@ from symbolics import Node
 from tokens import Token
 
 
-class ToNode(ABC):
+class TokenProcessor(ABC):
     @classmethod
     @abstractmethod
     def to_node(cls, token_stream: MutableSequence[Token | Node]) -> MutableSequence[Token | Node]:
         pass
 
 
-class Parentheses(ToNode):
+class Parentheses(TokenProcessor):
 
     @classmethod
     def to_node(cls, token_stream: MutableSequence[Token | Node]) -> MutableSequence[Token | Node]:

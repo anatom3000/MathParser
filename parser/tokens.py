@@ -4,12 +4,12 @@ from typing import Type
 
 import symbolics.operators as op
 from parser import parse
-from parser.processors import ToNode
+from parser.processors import TokenProcessor
 from symbolics import BinaryOperatorNode, Node
 from tokens import SimpleExplcitToken, MultipleExplicitToken, Token
 
 
-class BinaryOperatorRightToLeft(ToNode):
+class BinaryOperatorRightToLeft(TokenProcessor):
     node: Type[BinaryOperatorNode]
 
     @classmethod
@@ -22,7 +22,7 @@ class BinaryOperatorRightToLeft(ToNode):
         return token_stream
 
 
-class BinaryOperatorLeftToRight(ToNode):
+class BinaryOperatorLeftToRight(TokenProcessor):
     node: Type[BinaryOperatorNode]
 
     @classmethod
@@ -38,7 +38,7 @@ class BinaryOperatorLeftToRight(ToNode):
         return token_stream
 
 
-class Num(Token, ToNode):
+class Num(Token, TokenProcessor):
 
     @classmethod
     def to_node(cls, token_stream: MutableSequence[Token | Node]) -> MutableSequence[Token | Node]:
