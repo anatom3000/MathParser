@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from abc import abstractmethod, ABC
 from collections.abc import MutableSequence, Iterable
 from itertools import chain
