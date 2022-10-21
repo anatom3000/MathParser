@@ -1,19 +1,13 @@
 from __future__ import annotations
 
-from abc import abstractmethod, ABC
 from collections.abc import MutableSequence, Iterable
 from itertools import chain
 
 from symbolics import Node
 from tokens import Token
-from . import parse, tokens
-
-
-class TokenProcessor(ABC):
-    @classmethod
-    @abstractmethod
-    def to_node(cls, token_stream: MutableSequence[Token | Node]) -> MutableSequence[Token | Node]:
-        pass
+from . import parse
+from .token_processor import TokenProcessor
+from .tokens import OpeningParenthese, ClosingParenthese
 
 
 class Parentheses(TokenProcessor):
@@ -37,10 +31,10 @@ class Parentheses(TokenProcessor):
     @classmethod
     def to_node(cls, token_stream: MutableSequence[Token | Node]) -> MutableSequence[Token | Node]:
         opening_parentheses_indexes = list(map(lambda x: x[0],
-                                               filter(lambda x: isinstance(x[1], tokens.OpeningParenthese),
+                                               filter(lambda x: isinstance(x[1], OpeningParenthese),
                                                       enumerate(token_stream))))
         closing_parentheses_indexes = list(map(lambda x: x[0],
-                                               filter(lambda x: isinstance(x[1], tokens.ClosingParenthese),
+                                               filter(lambda x: isinstance(x[1], ClosingParenthese),
                                                       enumerate(token_stream))))
 
         parentheses_levels = cls.get_parenthese_levels(opening_parentheses_indexes, closing_parentheses_indexes)

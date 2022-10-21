@@ -4,7 +4,7 @@ from collections.abc import MutableSequence
 from typing import Type
 
 import symbolics.operators as op
-from parser.processors import TokenProcessor
+from .token_processor import TokenProcessor
 from symbolics import BinaryOperatorNode, Node
 from tokens import SimpleExplcitToken, MultipleExplicitToken, Token
 
