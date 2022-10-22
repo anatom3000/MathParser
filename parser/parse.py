@@ -47,6 +47,7 @@ def parse_tokens(token_stream: MutableSequence[Token | Node]) -> Optional[Node]:
         return None
 
     if len(token_stream) != 1:
+        print(token_stream)
         raise ParsingError("incorrect number of nodes/tokens remaining after parsing")
 
     result = token_stream[0]

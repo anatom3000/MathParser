@@ -118,3 +118,4 @@ class OpeningParenthese(SimpleExplcitToken):
 
 class ClosingParenthese(SimpleExplcitToken):
     name = ")"
+

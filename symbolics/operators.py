@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from abc import ABC
+from abc import ABC, abstractmethod
 from collections.abc import Callable, Sequence
 
 from symbolics.nodes import Node, BinaryOperatorNode, EvaluateError
@@ -65,9 +65,32 @@ class ReduceableBinaryOperator(BinaryOperatorNode, ABC):
             return type(self)(self.left.reduce(), self.right.reduce())
 
 
-class Function(NodeWithOperatorSupport, ABC):
-    func: Callable[[Node], Node]
-    args: Sequence[Node]
+class FunctionNode(NodeWithOperatorSupport, ABC):
+    name: str
+    arg: Node
+
+    def __init__(self, arg: Node):
+        self.arg = arg
+
+    @classmethod
+    @abstractmethod
+    def call(cls, arg: Node) -> Value:
+        pass
+
+    def evaluate(self) -> Value:
+        try:
+            return self.call(self.arg)
+        except Exception as exc:
+            raise EvaluateError(f"error while evaluating function call {self.name}({self.arg})") from exc
+
+    def reduce(self) -> Node:
+        if isinstance(self.arg, Value):
+            return self.evaluate()
+        else:
+            return self
+
+    def __repr__(self):
+        return f"{self.name}({self.arg.evaluate()})"
 
 
 class Value(NodeWithOperatorSupport):
@@ -130,7 +153,11 @@ class Mul(ReduceableBinaryOperator, NodeWithOperatorSupport):
 
 class Div(ReduceableBinaryOperator, NodeWithOperatorSupport):
     def evaluate(self) -> Value:
-        return Value(self.left.evaluate().value / self.right.evaluate().value)
+        left = self.left.evaluate().value
+        right = self.right.evaluate().value
+        if right == 0:
+            raise EvaluateError(f"can't divide {left} by zero")
+        return Value(left / right)
 
     def __repr__(self) -> str:
         return f"({repr(self.left)} / {repr(self.right)})"
