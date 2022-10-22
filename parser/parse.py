@@ -25,6 +25,7 @@ TOKENS_PROCESSORS: list[Type[TokenProcessor]] = [
     # TODO: implicit multiplication e. g. 2(3+5)
     Parentheses,
     Num,
+    Name,
     Pow,
     Div,
     Mul,

@@ -21,6 +21,14 @@ class Abs(DirectFunctionNode):
     func = abs
 
 
+class Floor(DirectFunctionNode):
+    func = math.floor
+
+
+class Sqrt(DirectFunctionNode):
+    func = math.sqrt
+
+
 class Sin(DirectFunctionNode):
     func = math.sin
 
@@ -29,5 +37,6 @@ class Cos(DirectFunctionNode):
     func = math.cos
 
 
-class Floor(DirectFunctionNode):
-    func = math.floor
+class Tan(DirectFunctionNode):
+    func = math.tan
+

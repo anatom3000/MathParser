@@ -90,7 +90,11 @@ class FunctionNode(NodeWithOperatorSupport, ABC):
             return self
 
     def __repr__(self):
-        return f"{self.name}({self.arg.evaluate()})"
+        arg_str = f"{self.arg}"
+        if arg_str[0] == '(' and arg_str[-1] == ')':
+            return f"{self.name}{self.arg}"
+        else:
+            return f"{self.name}({self.arg})"
 
 
 class Value(NodeWithOperatorSupport):
@@ -110,6 +114,15 @@ class Value(NodeWithOperatorSupport):
             return repr(int(self.value))
         else:
             return repr(self.value)
+
+
+class Constant(Value):
+    def __init__(self, value: float, name: str):
+        super().__init__(value)
+        self.name = name
+
+    def __repr__(self) -> str:
+        return self.name
 
 
 class Variable(NodeWithOperatorSupport):

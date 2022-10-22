@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from collections.abc import MutableSequence
 from typing import Type
 
@@ -71,7 +72,26 @@ class Num(Token, TokenProcessor):
             return False
 
 
-class Name(Token):
+class Name(Token, TokenProcessor):
+    CONSTANTS = {
+        "pi": op.Constant(math.pi, "pi"),
+        "tau": op.Constant(math.tau, "tau"),
+        "e": op.Constant(math.e, "e"),
+        "inf": op.Constant(math.inf, "Infinity")
+    }
+
+    @classmethod
+    def to_node(cls, token_stream: MutableSequence[Token | Node]) -> MutableSequence[Token | Node]:
+        operator_indexes = list(filter(lambda x: type(x[1]) == cls, enumerate(token_stream)))
+
+        index: int
+        for index, token in operator_indexes:
+            if token.symbols in cls.CONSTANTS:
+                token_stream[index] = cls.CONSTANTS[token.symbols]
+            else:
+                token_stream[index] = op.Name(token_stream[index].symbols)  # type: ignore
+
+        return token_stream
 
     @classmethod
     def is_candidate(cls, symbols: str) -> bool:

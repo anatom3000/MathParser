@@ -14,8 +14,10 @@ class Parentheses(TokenProcessor):
     FUNCTIONS = {
         "abs": funcs.Abs,
         "floor": funcs.Floor,
+        "sqrt": funcs.Sqrt,
         "sin": funcs.Sin,
         "cos": funcs.Cos,
+        "tan": funcs.Tan
     }
 
     @classmethod
@@ -51,28 +53,6 @@ class Parentheses(TokenProcessor):
         return closing_index
 
     @classmethod
-    def to_node(cls, token_stream: MutableSequence[Token | Node]) -> MutableSequence[Token | Node]:
-        opening_parentheses_indexes = list(map(lambda x: x[0],
-                                               filter(lambda x: isinstance(x[1], OpeningParenthese),
-                                                      enumerate(token_stream))))
-        closing_parentheses_indexes = list(map(lambda x: x[0],
-                                               filter(lambda x: isinstance(x[1], ClosingParenthese),
-                                                      enumerate(token_stream))))
-
-        parentheses_levels = cls.get_parenthese_levels(opening_parentheses_indexes, closing_parentheses_indexes)
-
-        index_offset = 0
-        for index, level in parentheses_levels.items():
-            index -= index_offset
-            if index in opening_parentheses_indexes and level == 0:
-                if index != 0 and isinstance(token_stream[index - 1], Name):
-                    index_offset += cls.handle_function(index, token_stream, parentheses_levels)
-                else:
-                    index_offset += cls.handle_parenthese(index, token_stream, parentheses_levels)
-
-        return token_stream
-
-    @classmethod
     def handle_parenthese(cls, index: int, token_stream: MutableSequence[Token | Node], levels: dict[int, int]) -> int:
 
         closing_index = cls.get_closing_parenthese(index, levels)
@@ -106,3 +86,26 @@ class Parentheses(TokenProcessor):
 
         else:
             raise parse.ParsingError(f"unknown function \"{func_name}\"")
+
+    @classmethod
+    def to_node(cls, token_stream: MutableSequence[Token | Node]) -> MutableSequence[Token | Node]:
+        opening_parentheses_indexes = list(map(lambda x: x[0],
+                                               filter(lambda x: isinstance(x[1], OpeningParenthese),
+                                                      enumerate(token_stream))))
+        closing_parentheses_indexes = list(map(lambda x: x[0],
+                                               filter(lambda x: isinstance(x[1], ClosingParenthese),
+                                                      enumerate(token_stream))))
+
+        parentheses_levels = cls.get_parenthese_levels(opening_parentheses_indexes, closing_parentheses_indexes)
+
+        index_offset = 0
+        for index, level in parentheses_levels.items():
+            index -= index_offset
+            if index in opening_parentheses_indexes and level == 0:
+                if index != 0 and isinstance(token_stream[index - 1], Name):
+                    index_offset += cls.handle_function(index, token_stream, parentheses_levels)
+                else:
+                    index_offset += cls.handle_parenthese(index, token_stream, parentheses_levels)
+
+        return token_stream
+
