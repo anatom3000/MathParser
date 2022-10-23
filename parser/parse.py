@@ -5,7 +5,7 @@ from typing import Optional, Type
 
 from symbolics import Node
 from tokens import Token, tokenize
-from .processors import Parentheses, TokenProcessor
+from .processors import Parentheses, TokenProcessor, ImplicitMulitplication
 from .tokens import Add, Sub, Pow, Num, Mul, Div, Mod, OpeningParenthese, ClosingParenthese, Name
 
 TOKENS = [
@@ -22,7 +22,7 @@ TOKENS = [
 ]
 
 TOKENS_PROCESSORS: list[Type[TokenProcessor]] = [
-    # TODO: implicit multiplication e. g. 2(3+5)
+    ImplicitMulitplication,
     Parentheses,
     Num,
     Name,

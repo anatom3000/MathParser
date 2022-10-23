@@ -136,6 +136,9 @@ class Variable(NodeWithOperatorSupport):
     def reduce(self) -> Node:
         return self
 
+    def replace(self, name: str, value: Node) -> Node:
+        return value
+
     def __repr__(self) -> str:
         return self.name
 

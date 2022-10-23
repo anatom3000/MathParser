@@ -89,7 +89,7 @@ class Name(Token, TokenProcessor):
             if token.symbols in cls.CONSTANTS:
                 token_stream[index] = cls.CONSTANTS[token.symbols]
             else:
-                token_stream[index] = op.Name(token_stream[index].symbols)  # type: ignore
+                token_stream[index] = op.Variable(token_stream[index].symbols)  # type: ignore
 
         return token_stream
 

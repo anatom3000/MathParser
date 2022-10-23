@@ -1,4 +1,5 @@
 import parser
+from symbolics import EvaluateError, Value
 
 
 def main():
@@ -9,8 +10,11 @@ def main():
         case None:
             print("There is nothing in the expression!")
         case result:
-            print(f"{result} = {result.evaluate()}")
-
+            try:
+                print(f"{expr} = {result} = {result.evaluate()}")
+            except EvaluateError:
+                val = Value(float(input("x = ")))
+                print(f"{result}({val.value}) = {result.replace('x', val)}")
 
 if __name__ == '__main__':
     main()
