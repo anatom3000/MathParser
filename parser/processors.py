@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import MutableSequence, Iterable
 from itertools import chain
+from typing import Optional
 
 from symbolics import Node, functions as funcs, Value
 from tokens import Token
@@ -21,7 +22,7 @@ FUNCTIONS = {
 
 def get_parenthese_levels(opening_parentheses_indexes: Iterable[int],
                           closing_parentheses_indexes: Iterable[int],
-                          tokens: Iterable[int] = None) \
+                          tokens: Optional[Iterable[int]] = None) \
         -> dict[int, int]:
     if tokens is None:
         tokens = chain(opening_parentheses_indexes, closing_parentheses_indexes)
@@ -74,11 +75,10 @@ class Parentheses(TokenProcessor):
         return closing_index - index + (content is not None)
 
     @classmethod
-    def handle_function(cls, index: int, token_stream: MutableSequence[Token | Node], levels: dict[int, int]) \
-            -> (MutableSequence[Token | Node], int):
+    def handle_function(cls, index: int, token_stream: MutableSequence[Token | Node], levels: dict[int, int]) -> int:
         closing_index = cls.get_closing_parenthese(index, levels)
 
-        func_name = token_stream[index - 1].symbols
+        func_name = token_stream[index - 1].symbols  # type: ignore
 
         if func_name in FUNCTIONS:
             content = parse.parse_tokens(token_stream[index + 1:closing_index])
@@ -136,7 +136,7 @@ class ImplicitMulitplication(TokenProcessor):
                         token_stream.insert(index, Mul('<implied>'))
                         offset += 1
                     elif (isinstance(token_stream[index - 1], Name) and token_stream[
-                        index - 1].symbols not in FUNCTIONS):
+                        index - 1].symbols not in FUNCTIONS):  # type: ignore
                         token_stream.insert(index, Mul('<implied>'))
                         offset += 1
 
@@ -165,9 +165,9 @@ class Signs(TokenProcessor):
 
                 if isinstance(token_stream[index + 1], Num):
                     if index in plus_indexes:
-                        token_stream[index + 1].symbols = '+' + token_stream[index + 1].symbols
+                        token_stream[index + 1].symbols = '+' + token_stream[index + 1].symbols  # type: ignore
                     else:
-                        token_stream[index + 1].symbols = '-' + token_stream[index + 1].symbols
+                        token_stream[index + 1].symbols = '-' + token_stream[index + 1].symbols  # type: ignore
 
                     del token_stream[index]
                     offset -= 1

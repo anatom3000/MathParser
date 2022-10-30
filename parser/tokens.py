@@ -86,8 +86,8 @@ class Name(Token, TokenProcessor):
 
         index: int
         for index, token in operator_indexes:
-            if token.symbols in cls.CONSTANTS:
-                token_stream[index] = cls.CONSTANTS[token.symbols]
+            if token.symbols in cls.CONSTANTS:  # type: ignore
+                token_stream[index] = cls.CONSTANTS[token.symbols]  # type: ignore
             else:
                 token_stream[index] = op.Variable(token_stream[index].symbols)  # type: ignore
 
