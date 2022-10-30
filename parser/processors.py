@@ -3,11 +3,11 @@ from __future__ import annotations
 from collections.abc import MutableSequence, Iterable
 from itertools import chain
 
-from symbolics import Node, functions as funcs
+from symbolics import Node, functions as funcs, Value
 from tokens import Token
 from . import parse
 from .token_processor import TokenProcessor
-from .tokens import OpeningParenthese, ClosingParenthese, Name, Num, Mul
+from .tokens import OpeningParenthese, ClosingParenthese, Name, Num, Mul, Add, Sub
 
 FUNCTIONS = {
     "abs": funcs.Abs,
@@ -76,7 +76,6 @@ class Parentheses(TokenProcessor):
     @classmethod
     def handle_function(cls, index: int, token_stream: MutableSequence[Token | Node], levels: dict[int, int]) \
             -> (MutableSequence[Token | Node], int):
-        offset = 0
         closing_index = cls.get_closing_parenthese(index, levels)
 
         func_name = token_stream[index - 1].symbols
@@ -137,9 +136,50 @@ class ImplicitMulitplication(TokenProcessor):
                         token_stream.insert(index, Mul('<implied>'))
                         offset += 1
                     elif (isinstance(token_stream[index - 1], Name) and token_stream[
-                                index - 1].symbols not in FUNCTIONS):
+                        index - 1].symbols not in FUNCTIONS):
                         token_stream.insert(index, Mul('<implied>'))
                         offset += 1
 
+        return token_stream
+
+
+class Signs(TokenProcessor):
+    @classmethod
+    def to_node(cls, token_stream: MutableSequence[Token | Node]) -> MutableSequence[Token | Node]:
+        opening_parentheses_indexes = list(map(lambda x: x[0], filter(lambda x: isinstance(x[1], OpeningParenthese),
+                                                                      enumerate(token_stream))))
+        closing_parentheses_indexes = list(map(lambda x: x[0], filter(lambda x: isinstance(x[1], ClosingParenthese),
+                                                                      enumerate(token_stream))))
+        plus_indexes = list(map(lambda x: x[0], filter(lambda x: isinstance(x[1], Add), enumerate(token_stream))))
+        minus_indexes = list(map(lambda x: x[0], filter(lambda x: isinstance(x[1], Sub), enumerate(token_stream))))
+
+        levels = get_parenthese_levels(opening_parentheses_indexes, closing_parentheses_indexes,
+                                       chain(plus_indexes, minus_indexes))
+
+        offset = 0
+        for index, level in levels.items():
+            index += offset
+            if level == 0 and index != (len(token_stream) - 1):
+                if index != 0 and isinstance(token_stream[index - 1], (Num, Name, Node)):
+                    continue
+
+                if isinstance(token_stream[index + 1], Num):
+                    if index in plus_indexes:
+                        token_stream[index + 1].symbols = '+' + token_stream[index + 1].symbols
+                    else:
+                        token_stream[index + 1].symbols = '-' + token_stream[index + 1].symbols
+
+                    del token_stream[index]
+                    offset -= 1
+
+                elif isinstance(token_stream[index + 1], (Name, Node)):
+                    if index in plus_indexes:
+                        del token_stream[index]
+                        offset -= 1
+                    else:
+                        token_stream[index:index + 1] = [Value(-1.0), Mul("<from minus sign>")]
+                        offset += 1
+                else:
+                    continue
 
         return token_stream

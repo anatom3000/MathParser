@@ -5,7 +5,7 @@ from typing import Optional, Type
 
 from symbolics import Node
 from tokens import Token, tokenize
-from .processors import Parentheses, TokenProcessor, ImplicitMulitplication
+from .processors import Parentheses, TokenProcessor, ImplicitMulitplication, Signs
 from .tokens import Add, Sub, Pow, Num, Mul, Div, Mod, OpeningParenthese, ClosingParenthese, Name
 
 TOKENS = [
@@ -24,6 +24,7 @@ TOKENS = [
 TOKENS_PROCESSORS: list[Type[TokenProcessor]] = [
     ImplicitMulitplication,
     Parentheses,
+    Signs,
     Num,
     Name,
     Pow,
@@ -43,6 +44,8 @@ class ParsingError(Exception):
 def parse_tokens(token_stream: MutableSequence[Token | Node]) -> Optional[Node]:
     for op in TOKENS_PROCESSORS:
         token_stream = op.to_node(token_stream)
+        # print(f"After {op.__name__}: {token_stream}")
+
 
     if len(token_stream) == 0:
         return None
@@ -54,7 +57,7 @@ def parse_tokens(token_stream: MutableSequence[Token | Node]) -> Optional[Node]:
     result = token_stream[0]
 
     if not isinstance(result, Node):
-        raise ParsingError("unknown token found")
+        raise ParsingError(f"unknown token found {result}")
 
     return result
 

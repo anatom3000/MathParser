@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from collections.abc import Callable, Sequence
 
 from symbolics.nodes import Node, BinaryOperatorNode, EvaluateError
 
@@ -137,7 +136,10 @@ class Variable(NodeWithOperatorSupport):
         return self
 
     def replace(self, name: str, value: Node) -> Node:
-        return value
+        if self.name == name:
+            return value
+        else:
+            return self
 
     def __repr__(self) -> str:
         return self.name

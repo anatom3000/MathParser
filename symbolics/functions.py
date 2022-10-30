@@ -39,4 +39,3 @@ class Cos(DirectFunctionNode):
 
 class Tan(DirectFunctionNode):
     func = math.tan
-
