@@ -2,7 +2,7 @@ import math
 from abc import ABC
 from collections.abc import Callable
 
-from symbolics import FunctionNode, Node, Value
+from human_math.symbolics import FunctionNode, Node, Value
 
 
 class DirectFunctionNode(FunctionNode, ABC):

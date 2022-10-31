@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from symbolics import operators
+from human_math.symbolics import operators
 
 
 class EvaluateError(ValueError):

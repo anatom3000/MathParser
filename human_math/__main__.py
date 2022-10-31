@@ -1,13 +1,13 @@
 import sys
 
-import parser
-from symbolics import EvaluateError, Value
+import human_math as hm
+from human_math.symbolics import EvaluateError, Value
 
 
 def main():
     expr = input("> ")
 
-    result = parser.parse(expr)
+    result = hm.parser.parse(expr)
     if result is None:
         print("There is nothing in the expression!")
     else:

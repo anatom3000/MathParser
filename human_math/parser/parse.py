@@ -3,8 +3,8 @@ from __future__ import annotations
 from collections.abc import MutableSequence
 from typing import Optional, Type
 
-from symbolics import Node
-from tokens import Token, tokenize
+from human_math.symbolics import Node
+from human_math.tokens import Token, tokenize
 from .processors import Parentheses, TokenProcessor, ImplicitMulitplication, Signs
 from .tokens import Add, Sub, Pow, Num, Mul, Div, Mod, OpeningParenthese, ClosingParenthese, Name
 
@@ -32,8 +32,7 @@ TOKENS_PROCESSORS: list[Type[TokenProcessor]] = [
     Mul,
     Mod,
     Sub,
-    Add,
-
+    Add
 ]
 
 
@@ -44,15 +43,14 @@ class ParsingError(Exception):
 def parse_tokens(token_stream: MutableSequence[Token | Node]) -> Optional[Node]:
     for op in TOKENS_PROCESSORS:
         token_stream = op.to_node(token_stream)
-        # print(f"After {op.__name__}: {token_stream}")
-
 
     if len(token_stream) == 0:
         return None
 
     if len(token_stream) != 1:
-        print(token_stream)
-        raise ParsingError("incorrect number of nodes/tokens remaining after parsing")
+        # print(token_stream)
+        # raise ParsingError("incorrect number of nodes/tokens remaining after parsing")
+        pass
 
     result = token_stream[0]
 

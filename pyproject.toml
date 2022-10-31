@@ -1,0 +1,33 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "human_math"
+authors = [{name = "anatom3000"}]
+readme = "README.md"
+license = {file = "LICENSE.md"}
+requires-python = ">=3.7"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Text Processing",
+    "Typing :: Typed"
+]
+keywords = [
+    "parser",
+    "math",
+    "maths",
+    "expression",
+    "token"
+]
+dynamic = ["version", "description"]
+
+[project.urls]
+Source = "https://github.com/anatom3000/human_math"
+Issues = "https://github.com/anatom3000/human_math/issues"
+
+[project.optional-dependencies]

@@ -4,10 +4,10 @@ import math
 from collections.abc import MutableSequence
 from typing import Type
 
-import symbolics.operators as op
+import human_math.symbolics.operators as op
 from .token_processor import TokenProcessor
-from symbolics import BinaryOperatorNode, Node
-from tokens import SimpleExplcitToken, MultipleExplicitToken, Token
+from human_math.symbolics import BinaryOperatorNode, Node
+from human_math.tokens import SimpleExplcitToken, MultipleExplicitToken, Token
 
 
 class BinaryOperatorRightToLeft(TokenProcessor):

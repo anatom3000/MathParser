@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from symbolics.nodes import Node, BinaryOperatorNode, EvaluateError
+from human_math.symbolics.nodes import Node, BinaryOperatorNode, EvaluateError
 
 
 class NodeWithOperatorSupport(Node, ABC):

@@ -4,8 +4,8 @@ from collections.abc import MutableSequence, Iterable
 from itertools import chain
 from typing import Optional
 
-from symbolics import Node, functions as funcs, Value
-from tokens import Token
+from human_math.symbolics import Node, functions as funcs, Value
+from human_math.tokens import Token
 from . import parse
 from .token_processor import TokenProcessor
 from .tokens import OpeningParenthese, ClosingParenthese, Name, Num, Mul, Add, Sub
@@ -88,7 +88,7 @@ class Parentheses(TokenProcessor):
             else:
                 token_stream[index - 1: closing_index + 1] = [FUNCTIONS[func_name](content)]
 
-                return closing_index - index
+                return closing_index - index - 1
 
         else:
             raise parse.ParsingError(f"unknown function \"{func_name}\"")
