@@ -62,24 +62,24 @@ def first_token(expression: str, token_kinds: TokenKinds) -> Token:
 def tokenize(expression: str, token_kinds: TokenKinds, *, raise_on_unknown: bool = True,
              ignore_whitespaces: bool = True) \
         -> MutableSequence[Token]:
-    if ignore_whitespaces:
-        expression = ''.join(expression.split())
 
     tokens: list[Token] = []
-    while len(expression) != 0:
-        token = first_token(expression, token_kinds)
 
-        is_unknown = isinstance(token, Unknown)
+    for part in expression.split():
+        while len(part) != 0:
+            token = first_token(part, token_kinds)
 
-        if raise_on_unknown and is_unknown:
-            raise TokenizingError(f"invalid expression \"{token.symbols}\" ")
+            is_unknown = isinstance(token, Unknown)
 
-        if len(tokens) != 0 and is_unknown and isinstance(tokens[-1], Unknown):
-            tokens[-1] = Unknown(tokens[-1].symbols + token.symbols)
-        else:
-            tokens.append(token)
+            if raise_on_unknown and is_unknown:
+                raise TokenizingError(f"invalid expression \"{token.symbols}\" ")
 
-        expression = expression[len(token.symbols):]
+            if len(tokens) != 0 and is_unknown and isinstance(tokens[-1], Unknown):
+                tokens[-1] = Unknown(tokens[-1].symbols + token.symbols)
+            else:
+                tokens.append(token)
+
+            part = part[len(token.symbols):]
 
     return tokens
 

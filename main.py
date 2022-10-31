@@ -11,10 +11,10 @@ def main():
         print("There is nothing in the expression!")
     else:
         try:
-            print(f"{expr} = {result} = {result.evaluate()}")
+            print(f"{expr} = {result.evaluate()}")
         except EvaluateError:
             val = Value(float(input("x = ")))
-            print(f"{result}({val.value}) = {result.replace('x', val)}")
+            print(f"{expr}({val.value}) = {result.replace('x', val).evaluate()}")
 
 if __name__ == '__main__':
     main()
