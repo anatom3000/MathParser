@@ -61,9 +61,12 @@ class Parentheses(TokenProcessor):
         return closing_index
 
     @classmethod
-    def handle_parenthese(cls, index: int, token_stream: MutableSequence[Token | Node], levels: dict[int, int]) -> int:
+    def handle_parenthese(cls, index: int, offset: int, token_stream: MutableSequence[Token | Node],
+                          levels: dict[int, int]) -> int:
 
-        closing_index = cls.get_closing_parenthese(index, levels)
+        closing_index = cls.get_closing_parenthese(index, levels) - offset
+
+        index -= offset
 
         content = parse.parse_tokens(token_stream[index + 1:closing_index])
 
@@ -72,11 +75,14 @@ class Parentheses(TokenProcessor):
         else:
             token_stream[index:closing_index + 1] = [content]
 
-        return closing_index - index + (content is not None)
+        return closing_index - index + (content is not None) - 1
 
     @classmethod
-    def handle_function(cls, index: int, token_stream: MutableSequence[Token | Node], levels: dict[int, int]) -> int:
-        closing_index = cls.get_closing_parenthese(index, levels)
+    def handle_function(cls, index: int, offset: int, token_stream: MutableSequence[Token | Node],
+                        levels: dict[int, int]) -> int:
+        closing_index = cls.get_closing_parenthese(index, levels) - offset
+
+        index -= offset
 
         func_name = token_stream[index - 1].symbols  # type: ignore
 
@@ -104,12 +110,13 @@ class Parentheses(TokenProcessor):
 
         index_offset = 0
         for index, level in parentheses_levels.items():
-            index -= index_offset
+
             if index in opening_parentheses_indexes and level == 0:
-                if index != 0 and isinstance(token_stream[index - 1], Name):
-                    index_offset += cls.handle_function(index, token_stream, parentheses_levels)
+
+                if index - index_offset != 0 and isinstance(token_stream[index - index_offset - 1], Name):
+                    index_offset += cls.handle_function(index, index_offset, token_stream, parentheses_levels)
                 else:
-                    index_offset += cls.handle_parenthese(index, token_stream, parentheses_levels)
+                    index_offset += cls.handle_parenthese(index, index_offset, token_stream, parentheses_levels)
 
         return token_stream
 
@@ -135,8 +142,8 @@ class ImplicitMulitplication(TokenProcessor):
                     if isinstance(token_stream[index - 1], (ClosingParenthese, Num)):
                         token_stream.insert(index, Mul('<implied>'))
                         offset += 1
-                    elif (isinstance(token_stream[index - 1], Name) and token_stream[
-                        index - 1].symbols not in FUNCTIONS):  # type: ignore
+                    elif isinstance(token_stream[index - 1], Name) and token_stream[
+                        index - 1].symbols not in FUNCTIONS:  # type: ignore
                         token_stream.insert(index, Mul('<implied>'))
                         offset += 1
 

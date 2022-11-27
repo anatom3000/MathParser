@@ -6,7 +6,7 @@ from typing import Optional, Type
 from human_math.symbolics import Node
 from human_math.tokens import Token, tokenize
 from .processors import Parentheses, TokenProcessor, ImplicitMulitplication, Signs
-from .tokens import Add, Sub, Pow, Num, Mul, Div, Mod, OpeningParenthese, ClosingParenthese, Name
+from .tokens import Add, Sub, Pow, Num, Mul, Div, Mod, OpeningParenthese, ClosingParenthese, Name, Wildcard
 
 TOKENS = [
     Num,
@@ -19,6 +19,7 @@ TOKENS = [
     OpeningParenthese,
     ClosingParenthese,
     Name,
+    Wildcard
 ]
 
 TOKENS_PROCESSORS: list[Type[TokenProcessor]] = [
@@ -27,12 +28,13 @@ TOKENS_PROCESSORS: list[Type[TokenProcessor]] = [
     Signs,
     Num,
     Name,
+    Wildcard,
     Pow,
     Div,
     Mul,
     Mod,
     Sub,
-    Add
+    Add,
 ]
 
 
@@ -42,15 +44,15 @@ class ParsingError(Exception):
 
 def parse_tokens(token_stream: MutableSequence[Token | Node]) -> Optional[Node]:
     for op in TOKENS_PROCESSORS:
+        # print(f"Before {op.__name__}: \n\t{token_stream = }")
         token_stream = op.to_node(token_stream)
 
     if len(token_stream) == 0:
         return None
 
     if len(token_stream) != 1:
-        # print(token_stream)
-        # raise ParsingError("incorrect number of nodes/tokens remaining after parsing")
-        pass
+        print(token_stream)
+        raise ParsingError("incorrect number of nodes/tokens remaining after parsing")
 
     result = token_stream[0]
 

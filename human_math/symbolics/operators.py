@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from human_math.symbolics.nodes import Node, BinaryOperatorNode, EvaluateError
+from human_math.symbolics.nodes import Node, BinaryOperatorNode, EvaluateError, Wildcard
 
 
 class NodeWithOperatorSupport(Node, ABC):
@@ -95,6 +95,9 @@ class FunctionNode(NodeWithOperatorSupport, ABC):
         else:
             return f"{self.name}({self.arg})"
 
+    def matches_raw(self, pattern: FunctionNode) -> bool:
+        return self.arg.matches(pattern.arg)
+
 
 class Value(NodeWithOperatorSupport):
 
@@ -114,6 +117,9 @@ class Value(NodeWithOperatorSupport):
         else:
             return repr(self.value)
 
+    def matches_raw(self, pattern: Value) -> bool:
+        return pattern.value == self.value
+
 
 class Constant(Value):
     def __init__(self, value: float, name: str):
@@ -122,6 +128,9 @@ class Constant(Value):
 
     def __repr__(self) -> str:
         return self.name
+
+    def matches_raw(self, pattern: Constant) -> bool:
+        return pattern.name == self.name and pattern.value == self.value
 
 
 class Variable(NodeWithOperatorSupport):
@@ -143,6 +152,10 @@ class Variable(NodeWithOperatorSupport):
 
     def __repr__(self) -> str:
         return self.name
+
+    def matches_raw(self, pattern: Variable) -> bool:
+        #print(f"{self = }, {pattern = }")
+        return self.name == pattern.name
 
 
 class Add(ReduceableBinaryOperator, NodeWithOperatorSupport):
