@@ -88,14 +88,14 @@ class FunctionNode(NodeWithOperatorSupport, ABC):
         else:
             return self
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         arg_str = f"{self.arg}"
         if arg_str[0] == '(' and arg_str[-1] == ')':
             return f"{self.name}{self.arg}"
         else:
             return f"{self.name}({self.arg})"
 
-    def matches_raw(self, pattern: FunctionNode) -> bool:
+    def matches_raw(self, pattern: FunctionNode) -> bool:  # type: ignore
         return self.arg.matches(pattern.arg)
 
 
@@ -117,7 +117,7 @@ class Value(NodeWithOperatorSupport):
         else:
             return repr(self.value)
 
-    def matches_raw(self, pattern: Value) -> bool:
+    def matches_raw(self, pattern: Value) -> bool:  # type: ignore
         return pattern.value == self.value
 
 
@@ -129,7 +129,7 @@ class Constant(Value):
     def __repr__(self) -> str:
         return self.name
 
-    def matches_raw(self, pattern: Constant) -> bool:
+    def matches_raw(self, pattern: Constant) -> bool:  # type: ignore
         return pattern.name == self.name and pattern.value == self.value
 
 
@@ -153,7 +153,7 @@ class Variable(NodeWithOperatorSupport):
     def __repr__(self) -> str:
         return self.name
 
-    def matches_raw(self, pattern: Variable) -> bool:
+    def matches_raw(self, pattern: Variable) -> bool:  # type: ignore
         #print(f"{self = }, {pattern = }")
         return self.name == pattern.name
 

@@ -47,7 +47,7 @@ def get_parenthese_levels(opening_parentheses_indexes: Iterable[int],
 class Parentheses(TokenProcessor):
 
     @classmethod
-    def get_closing_parenthese(cls, opening_parenthese_index: int, levels: dict[int, int]):
+    def get_closing_parenthese(cls, opening_parenthese_index: int, levels: dict[int, int]) -> int:
         last_parenthese = max(levels.keys())
 
         closing_index = opening_parenthese_index + 1

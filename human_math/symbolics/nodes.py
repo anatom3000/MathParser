@@ -29,7 +29,7 @@ class Node(ABC):
             return False
 
     @abstractmethod
-    def matches_raw(self, pattern: Node) -> bool:
+    def matches_raw(self, pattern: Node) -> bool:  # type: ignore
         pass
 
 
@@ -44,7 +44,7 @@ class BinaryOperatorNode(Node, ABC):
 
         return self
 
-    def matches_raw(self, pattern: BinaryOperatorNode) -> bool:
+    def matches_raw(self, pattern: BinaryOperatorNode) -> bool:  # type: ignore
         return self.left.matches(pattern.left) and self.right.matches(pattern.right)
 
     # self.evaluate() left to implement by subclassing
@@ -54,11 +54,11 @@ class BinaryOperatorNode(Node, ABC):
 
 
 class Wildcard(Node):
-    def matches_raw(self, pattern: Node) -> bool:
+    def matches_raw(self, pattern: Node) -> bool:  # type: ignore
         return True
 
     def evaluate(self) -> operators.Value:
         raise EvaluateError("can't evaluate a wildward (used for pattern matching)")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<Wildcard>"

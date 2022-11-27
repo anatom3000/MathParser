@@ -9,8 +9,8 @@ class DirectFunctionNode(FunctionNode, ABC):
     func: Callable[[float], float]
 
     @property
-    def name(self):
-        return self.func.__name__
+    def name(self) -> str:  # type: ignore
+        return self.func.__name__  # type: ignore
 
     @classmethod
     def call(cls, arg: Node) -> Value:
