@@ -5,7 +5,6 @@ from collections.abc import MutableSequence
 from typing import Type
 
 import human_math.symbolics.operators as op
-from human_math.symbolics.nodes import Wildcard as Wc
 from .token_processor import TokenProcessor
 from human_math.symbolics import BinaryOperatorNode, Node
 from human_math.tokens import SimpleExplcitToken, MultipleExplicitToken, Token
@@ -133,23 +132,17 @@ class Mod(SimpleExplcitToken, BinaryOperatorRightToLeft):
     node = op.Mod
 
 
-class OpeningParenthese(SimpleExplcitToken):
+class ParentheseOpen(SimpleExplcitToken):
     name = "("
 
 
-class ClosingParenthese(SimpleExplcitToken):
+class ParentheseClose(SimpleExplcitToken):
     name = ")"
 
 
-class Wildcard(SimpleExplcitToken, TokenProcessor):
-    name = "[]"  # '*' is already used for multiplication
+class WildcardOpen(SimpleExplcitToken):
+    name = "["
 
-    @classmethod
-    def to_node(cls, token_stream: MutableSequence[Token | Node]) -> MutableSequence[Token | Node]:
-        operator_indexes = list(map(lambda x: x[0], filter(lambda x: type(x[1]) == cls, enumerate(token_stream))))
 
-        index: int
-        for index in operator_indexes:
-            token_stream[index] = Wc()  # type: ignore
-
-        return token_stream
+class WildcardClose(SimpleExplcitToken):
+    name = "]"

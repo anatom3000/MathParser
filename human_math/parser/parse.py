@@ -5,8 +5,9 @@ from typing import Optional, Type
 
 from human_math.symbolics import Node
 from human_math.tokens import Token, tokenize
-from .processors import Parentheses, TokenProcessor, ImplicitMulitplication, Signs
-from .tokens import Add, Sub, Pow, Num, Mul, Div, Mod, OpeningParenthese, ClosingParenthese, Name, Wildcard
+from .processors import Parentheses, TokenProcessor, ImplicitMulitplication, Signs, Wildcard
+from .tokens import Add, Sub, Pow, Num, Mul, Div, Mod, ParentheseOpen, ParentheseClose, Name, WildcardClose, \
+    WildcardOpen
 
 TOKENS = [
     Num,
@@ -16,10 +17,11 @@ TOKENS = [
     Div,
     Pow,
     Mod,
-    OpeningParenthese,
-    ClosingParenthese,
+    ParentheseOpen,
+    ParentheseClose,
     Name,
-    Wildcard
+    WildcardOpen,
+    WildcardClose
 ]
 
 TOKENS_PROCESSORS: list[Type[TokenProcessor]] = [

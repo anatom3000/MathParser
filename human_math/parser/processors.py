@@ -1,14 +1,17 @@
 from __future__ import annotations
 
-from collections.abc import MutableSequence, Iterable
+from abc import ABC, abstractmethod
+from collections.abc import MutableSequence, Iterable, Sequence
 from itertools import chain
-from typing import Optional
+from typing import Optional, Type
 
 from human_math.symbolics import Node, functions as funcs, Value
 from human_math.tokens import Token
 from . import parse
 from .token_processor import TokenProcessor
-from .tokens import OpeningParenthese, ClosingParenthese, Name, Num, Mul, Add, Sub
+from .tokens import ParentheseOpen, ParentheseClose, Name, Num, Mul, Add, Sub, WildcardOpen, WildcardClose
+from human_math.symbolics.nodes import Wildcard as Wc
+
 
 FUNCTIONS = {
     "abs": funcs.Abs,
@@ -20,9 +23,9 @@ FUNCTIONS = {
 }
 
 
-def get_parenthese_levels(opening_parentheses_indexes: Iterable[int],
-                          closing_parentheses_indexes: Iterable[int],
-                          tokens: Optional[Iterable[int]] = None) \
+def get_coupled_token_levels(opening_parentheses_indexes: Iterable[int],
+                             closing_parentheses_indexes: Iterable[int],
+                             tokens: Optional[Iterable[int]] = None) \
         -> dict[int, int]:
     if tokens is None:
         tokens = chain(opening_parentheses_indexes, closing_parentheses_indexes)
@@ -44,130 +47,149 @@ def get_parenthese_levels(opening_parentheses_indexes: Iterable[int],
     return levels
 
 
-class Parentheses(TokenProcessor):
+class CoupledTokens(TokenProcessor, ABC):
+    opening_token: Type[Token]
+    closing_token: Type[Token]
 
     @classmethod
-    def get_closing_parenthese(cls, opening_parenthese_index: int, levels: dict[int, int]) -> int:
-        last_parenthese = max(levels.keys())
+    def get_closing_token(cls, opening_token_index: int, levels: dict[int, int]) -> int:
+        last_couple_token = max(levels.keys())
 
-        closing_index = opening_parenthese_index + 1
+        closing_index = opening_token_index + 1
 
         while levels.get(closing_index, -1) != 0:
             closing_index += 1
 
-            if closing_index > last_parenthese:
-                raise parse.ParsingError(f"unmatched '(' at token {opening_parenthese_index}")
+            if closing_index > last_couple_token:
+                raise parse.ParsingError(f"unmatched opening coupled token at token {opening_token_index}")
 
         return closing_index
 
     @classmethod
-    def handle_parenthese(cls, index: int, offset: int, token_stream: MutableSequence[Token | Node],
-                          levels: dict[int, int]) -> int:
-
-        closing_index = cls.get_closing_parenthese(index, levels) - offset
-
-        index -= offset
-
-        content = parse.parse_tokens(token_stream[index + 1:closing_index])
-
-        if content is None:
-            token_stream[index:closing_index + 1] = []
-        else:
-            token_stream[index:closing_index + 1] = [content]
-
-        return closing_index - index + (content is not None) - 1
-
-    @classmethod
-    def handle_function(cls, index: int, offset: int, token_stream: MutableSequence[Token | Node],
-                        levels: dict[int, int]) -> int:
-        closing_index = cls.get_closing_parenthese(index, levels) - offset
-
-        index -= offset
-
-        func_name = token_stream[index - 1].symbols  # type: ignore
-
-        if func_name in FUNCTIONS:
-            content = parse.parse_tokens(token_stream[index + 1:closing_index])
-
-            if content is None:
-                raise parse.ParsingError(f"no argument provided to function {func_name}")
-            else:
-                token_stream[index - 1: closing_index + 1] = [FUNCTIONS[func_name](content)]
-
-                return closing_index - index - 1
-
-        else:
-            raise parse.ParsingError(f"unknown function \"{func_name}\"")
-
-    @classmethod
     def to_node(cls, token_stream: MutableSequence[Token | Node]) -> MutableSequence[Token | Node]:
-        opening_parentheses_indexes = list(map(lambda x: x[0], filter(lambda x: isinstance(x[1], OpeningParenthese),
-                                                                      enumerate(token_stream))))
-        closing_parentheses_indexes = list(map(lambda x: x[0], filter(lambda x: isinstance(x[1], ClosingParenthese),
-                                                                      enumerate(token_stream))))
+        opening_tokens_indexes = list(map(lambda x: x[0], filter(lambda x: isinstance(x[1], cls.opening_token),
+                                                                 enumerate(token_stream))))
+        closing_tokens_indexes = list(map(lambda x: x[0], filter(lambda x: isinstance(x[1], cls.closing_token),
+                                                                 enumerate(token_stream))))
 
-        parentheses_levels = get_parenthese_levels(opening_parentheses_indexes, closing_parentheses_indexes)
+        parentheses_levels = get_coupled_token_levels(opening_tokens_indexes, closing_tokens_indexes)
 
         index_offset = 0
         for index, level in parentheses_levels.items():
 
-            if index in opening_parentheses_indexes and level == 0:
+            if index in opening_tokens_indexes and level == 0:
 
-                if index - index_offset != 0 and isinstance(token_stream[index - index_offset - 1], Name):
-                    index_offset += cls.handle_function(index, index_offset, token_stream, parentheses_levels)
-                else:
-                    index_offset += cls.handle_parenthese(index, index_offset, token_stream, parentheses_levels)
+                closing_index = cls.get_closing_token(index, parentheses_levels) - index_offset
+
+                index -= index_offset
+                block_tokens = token_stream[index + 1:closing_index]
+
+                processed = cls.handle_block(block_tokens, token_stream, index, closing_index)
+                print(f"Processed: {processed}")
+                token_stream[index:closing_index + 1] = processed
+
+                index_offset += closing_index - index + 1 - len(processed)
+
 
         return token_stream
+
+    @classmethod
+    @abstractmethod
+    def handle_block(cls, tokens: Sequence[Token], token_stream: Sequence[Token | Node], opening_index: int, closing_index: int) -> Sequence[Node]:
+        pass
+
+class Parentheses(CoupledTokens):
+    opening_token = ParentheseOpen
+    closing_token = ParentheseClose
+
+    @classmethod
+    def handle_block(cls, tokens: Sequence[Token], token_stream: Sequence[Token | Node], opening_index: int, closing_index: int) -> Sequence[Node]:
+        if opening_index != 0 and isinstance(token_stream[opening_index - 1], Name):
+
+            return cls.handle_function(tokens, opening_index, token_stream)
+        else:
+            return cls.handle_parentheses(tokens)
+
+    @classmethod
+    def handle_parentheses(cls, tokens: Sequence[Token]) -> Sequence[Node]:
+
+        content = parse.parse_tokens(tokens)
+
+        return [] if content is None else [content]
+
+    @classmethod
+    def handle_function(cls, tokens: Sequence[Token], opening_index: int, token_stream: Sequence[Token | Node]) -> Sequence[Node]:
+
+
+        func_name = token_stream[opening_index - 1].symbols  # type: ignore
+
+        if func_name in FUNCTIONS:
+            content = parse.parse_tokens(tokens)
+
+            if content is None:
+                raise parse.ParsingError(f"no argument provided to function {func_name}")
+
+            return [FUNCTIONS[func_name](content)]
+
+        raise parse.ParsingError(f"unknown function \"{func_name}\"")
 
 
 class ImplicitMulitplication(TokenProcessor):
 
     @classmethod
     def to_node(cls, token_stream: MutableSequence[Token | Node]) -> MutableSequence[Token | Node]:
-        opening_parentheses_indexes = list(map(lambda x: x[0], filter(lambda x: isinstance(x[1], OpeningParenthese),
+        opening_parentheses_indexes = list(map(lambda x: x[0], filter(lambda x: isinstance(x[1], ParentheseOpen),
                                                                       enumerate(token_stream))))
-        closing_parentheses_indexes = list(map(lambda x: x[0], filter(lambda x: isinstance(x[1], ClosingParenthese),
+        closing_parentheses_indexes = list(map(lambda x: x[0], filter(lambda x: isinstance(x[1], ParentheseClose),
                                                                       enumerate(token_stream))))
         name_indexes = list(map(lambda x: x[0], filter(lambda x: isinstance(x[1], Name), enumerate(token_stream))))
 
-        levels = get_parenthese_levels(opening_parentheses_indexes, closing_parentheses_indexes,
-                                       chain(opening_parentheses_indexes, name_indexes))
+        levels = get_coupled_token_levels(opening_parentheses_indexes, closing_parentheses_indexes,
+                                          chain(opening_parentheses_indexes, name_indexes))
 
         offset = 0
         for index, level in levels.items():
             index += offset
             if level == 0:
                 if index != 0:
-                    if isinstance(token_stream[index - 1], (ClosingParenthese, Num)):
+                    if isinstance(token_stream[index - 1], (ParentheseClose, Num)):
                         token_stream.insert(index, Mul('<implied>'))
                         offset += 1
-                    elif isinstance(token_stream[index - 1], Name) and token_stream[
-                        index - 1].symbols not in FUNCTIONS:  # type: ignore
+                    elif isinstance(token_stream[index - 1], Name) and token_stream[index - 1].symbols not in FUNCTIONS:  # type: ignore
                         token_stream.insert(index, Mul('<implied>'))
                         offset += 1
 
         return token_stream
 
+class Wildcard(CoupledTokens):
+    opening_token = WildcardOpen
+    closing_token = WildcardClose
+
+    @classmethod
+    def handle_block(cls, tokens: Sequence[Token], token_stream: Sequence[Token | Node], opening_index: int, closing_index: int) -> Sequence[Node]:
+        return [Wc()]
+
 
 class Signs(TokenProcessor):
+    OPERATIONABLE_TOKENS = (Num, Name, Node, Wildcard)  # don't remove if operator
+
     @classmethod
     def to_node(cls, token_stream: MutableSequence[Token | Node]) -> MutableSequence[Token | Node]:
-        opening_parentheses_indexes = list(map(lambda x: x[0], filter(lambda x: isinstance(x[1], OpeningParenthese),
+        opening_parentheses_indexes = list(map(lambda x: x[0], filter(lambda x: isinstance(x[1], ParentheseOpen),
                                                                       enumerate(token_stream))))
-        closing_parentheses_indexes = list(map(lambda x: x[0], filter(lambda x: isinstance(x[1], ClosingParenthese),
+        closing_parentheses_indexes = list(map(lambda x: x[0], filter(lambda x: isinstance(x[1], ParentheseClose),
                                                                       enumerate(token_stream))))
         plus_indexes = list(map(lambda x: x[0], filter(lambda x: isinstance(x[1], Add), enumerate(token_stream))))
         minus_indexes = list(map(lambda x: x[0], filter(lambda x: isinstance(x[1], Sub), enumerate(token_stream))))
 
-        levels = get_parenthese_levels(opening_parentheses_indexes, closing_parentheses_indexes,
-                                       chain(plus_indexes, minus_indexes))
+        levels = get_coupled_token_levels(opening_parentheses_indexes, closing_parentheses_indexes,
+                                          chain(plus_indexes, minus_indexes))
 
         offset = 0
         for index, level in levels.items():
             index += offset
             if level == 0 and index != (len(token_stream) - 1):
-                if index != 0 and isinstance(token_stream[index - 1], (Num, Name, Node)):
+                if index != 0 and isinstance(token_stream[index - 1], cls.OPERATIONABLE_TOKENS):
                     continue
 
                 if isinstance(token_stream[index + 1], Num):
@@ -190,3 +212,4 @@ class Signs(TokenProcessor):
                     continue
 
         return token_stream
+
