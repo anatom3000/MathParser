@@ -6,12 +6,11 @@ from itertools import chain
 from typing import Optional, Type
 
 from human_math.symbolics import Node, functions as funcs, Value
+from human_math.symbolics.nodes import Wildcard as Wc
 from human_math.tokens import Token
 from . import parse
 from .token_processor import TokenProcessor
 from .tokens import ParentheseOpen, ParentheseClose, Name, Num, Mul, Add, Sub, WildcardOpen, WildcardClose
-from human_math.symbolics.nodes import Wildcard as Wc
-
 
 FUNCTIONS = {
     "abs": funcs.Abs,
@@ -34,14 +33,14 @@ def get_coupled_token_levels(opening_parentheses_indexes: Iterable[int],
 
     levels = {}
     nesting_level = 0
-    for p in sorted(set(chain(opening_parentheses_indexes, closing_parentheses_indexes, tokens))):
-        if p in closing_parentheses_indexes:
+    for index in sorted(set(chain(opening_parentheses_indexes, closing_parentheses_indexes, tokens))):
+        if index in closing_parentheses_indexes:
             nesting_level -= 1
 
-        if p in tokens:
-            levels[p] = nesting_level
+        if index in tokens:
+            levels[index] = nesting_level
 
-        if p in opening_parentheses_indexes:
+        if index in opening_parentheses_indexes:
             nesting_level += 1
 
     return levels
@@ -61,6 +60,7 @@ class CoupledTokens(TokenProcessor, ABC):
             closing_index += 1
 
             if closing_index > last_couple_token:
+                # noinspection PyUnresolvedReferences
                 raise parse.ParsingError(f"unmatched opening coupled token at token {opening_token_index}")
 
         return closing_index
@@ -78,7 +78,6 @@ class CoupledTokens(TokenProcessor, ABC):
         for index, level in parentheses_levels.items():
 
             if index in opening_tokens_indexes and level == 0:
-
                 closing_index = cls.get_closing_token(index, parentheses_levels) - index_offset
 
                 index -= index_offset
@@ -90,20 +89,23 @@ class CoupledTokens(TokenProcessor, ABC):
 
                 index_offset += closing_index - index + 1 - len(processed)
 
-
         return token_stream
 
     @classmethod
     @abstractmethod
-    def handle_block(cls, tokens: Sequence[Token], token_stream: Sequence[Token | Node], opening_index: int, closing_index: int) -> Sequence[Node]:
+    def handle_block(cls, tokens: Sequence[Token], token_stream: Sequence[Token | Node], opening_index: int,
+                     closing_index: int) -> Sequence[Node]:
         pass
 
+
+# noinspection PyUnresolvedReferences
 class Parentheses(CoupledTokens):
     opening_token = ParentheseOpen
     closing_token = ParentheseClose
 
     @classmethod
-    def handle_block(cls, tokens: Sequence[Token], token_stream: Sequence[Token | Node], opening_index: int, closing_index: int) -> Sequence[Node]:
+    def handle_block(cls, tokens: Sequence[Token], token_stream: Sequence[Token | Node], opening_index: int,
+                     closing_index: int) -> Sequence[Node]:
         if opening_index != 0 and isinstance(token_stream[opening_index - 1], Name):
 
             return cls.handle_function(tokens, opening_index, token_stream)
@@ -118,8 +120,8 @@ class Parentheses(CoupledTokens):
         return [] if content is None else [content]
 
     @classmethod
-    def handle_function(cls, tokens: Sequence[Token], opening_index: int, token_stream: Sequence[Token | Node]) -> Sequence[Node]:
-
+    def handle_function(cls, tokens: Sequence[Token], opening_index: int, token_stream: Sequence[Token | Node]) -> \
+    Sequence[Node]:
 
         func_name = token_stream[opening_index - 1].symbols  # type: ignore
 
@@ -155,18 +157,21 @@ class ImplicitMulitplication(TokenProcessor):
                     if isinstance(token_stream[index - 1], (ParentheseClose, Num)):
                         token_stream.insert(index, Mul('<implied>'))
                         offset += 1
-                    elif isinstance(token_stream[index - 1], Name) and token_stream[index - 1].symbols not in FUNCTIONS:  # type: ignore
+                    elif isinstance(token_stream[index - 1], Name) and token_stream[
+                        index - 1].symbols not in FUNCTIONS:  # type: ignore
                         token_stream.insert(index, Mul('<implied>'))
                         offset += 1
 
         return token_stream
+
 
 class Wildcard(CoupledTokens):
     opening_token = WildcardOpen
     closing_token = WildcardClose
 
     @classmethod
-    def handle_block(cls, tokens: Sequence[Token], token_stream: Sequence[Token | Node], opening_index: int, closing_index: int) -> Sequence[Node]:
+    def handle_block(cls, tokens: Sequence[Token], token_stream: Sequence[Token | Node], opening_index: int,
+                     closing_index: int) -> Sequence[Node]:
         return [Wc()]
 
 
@@ -212,4 +217,3 @@ class Signs(TokenProcessor):
                     continue
 
         return token_stream
-

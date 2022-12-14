@@ -5,9 +5,9 @@ from collections.abc import MutableSequence
 from typing import Type
 
 import human_math.symbolics.operators as op
-from .token_processor import TokenProcessor
 from human_math.symbolics import BinaryOperatorNode, Node
 from human_math.tokens import SimpleExplcitToken, MultipleExplicitToken, Token
+from .token_processor import TokenProcessor
 
 
 class BinaryOperatorRightToLeft(TokenProcessor):

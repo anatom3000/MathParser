@@ -65,4 +65,4 @@ def parse_tokens(token_stream: MutableSequence[Token | Node]) -> Optional[Node]:
 
 
 def parse(expression: str) -> Node:
-    return parse_tokens(tokenize(expression, TOKENS, raise_on_unknown=False, ignore_whitespaces=True))  # type: ignore
+    return parse_tokens(tokenize(expression, TOKENS, raise_on_unknown=True))  # type: ignore

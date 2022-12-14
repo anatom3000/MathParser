@@ -42,10 +42,10 @@ class MultipleExplicitToken(Token):
 
     @classmethod
     def is_candidate(cls, symbols: str) -> bool:
-        return any([
+        return any(
             len(symbols) <= len(name) and name[:len(symbols)] == symbols
             for name in cls.names
-        ])
+        )
 
     @classmethod
     def is_valid(cls, symbols: str) -> bool:

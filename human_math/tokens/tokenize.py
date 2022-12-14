@@ -29,11 +29,10 @@ def first_token(expression: str, token_kinds: TokenKinds) -> Token:
                 kind_number = len(valid_kinds)
                 if kind_number == 0:
                     return Unknown(previous_part)
-                else:
-                    return valid_kinds[0](previous_part)
 
-            else:
-                return Unknown(expression[:last_char])
+                return valid_kinds[0](previous_part)
+
+            return Unknown(expression[:last_char])
 
         elif len(candidates) == 1:
             candidate = candidates[0]
@@ -59,10 +58,7 @@ def first_token(expression: str, token_kinds: TokenKinds) -> Token:
                 candidates = [kind for kind in token_kinds if kind.is_candidate(expression[:last_char])]
 
 
-def tokenize(expression: str, token_kinds: TokenKinds, *, raise_on_unknown: bool = True,
-             ignore_whitespaces: bool = True) \
-        -> MutableSequence[Token]:
-
+def tokenize(expression: str, token_kinds: TokenKinds, *, raise_on_unknown: bool = True) -> MutableSequence[Token]:
     tokens: list[Token] = []
 
     for part in expression.split():
