@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import itertools
 from abc import ABC, abstractmethod
 
 from human_math.symbolics import operators
@@ -52,6 +53,29 @@ class BinaryOperatorNode(Node, ABC):
     # def evaluate(self):
     #     return self.left + self.right
 
+class CommutativeAssociativeOperatorNode(Node, ABC):
+    def __init__(self, *childs: Node):
+        self.childs = []
+        for c in childs:
+            if isinstance(c, self.__class__):
+                self.childs.extend(c.childs)
+            else:
+                self.childs.append(c)
+
+    def replace(self, name: str, value: Node) -> Node:
+        for c in self.childs:
+            c.replace(name, value)
+        return self
+
+    def matches_raw(self, pattern: Node) -> bool:
+        # https://stackoverflow.com/questions/45924314/unordered-tree-pattern-matching-algorithm
+        # TL;DR matching unordered trees sucks
+
+        for childs in itertools.permutations(self.childs):
+            if all(node_child.matches(pattern_child) for node_child, pattern_child in zip(childs, pattern.childs)):
+                return True
+
+        return False
 
 class Wildcard(Node):
     def matches_raw(self, pattern: Node) -> bool:  # type: ignore

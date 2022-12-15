@@ -84,7 +84,7 @@ class CoupledTokens(TokenProcessor, ABC):
                 block_tokens = token_stream[index + 1:closing_index]
 
                 processed = cls.handle_block(block_tokens, token_stream, index, closing_index)
-                print(f"Processed: {processed}")
+                # print(f"Processed: {processed}")
                 token_stream[index:closing_index + 1] = processed
 
                 index_offset += closing_index - index + 1 - len(processed)

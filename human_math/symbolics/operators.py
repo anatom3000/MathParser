@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from human_math.symbolics.nodes import Node, BinaryOperatorNode, EvaluateError
+from human_math.symbolics.nodes import Node, BinaryOperatorNode, EvaluateError, CommutativeAssociativeOperatorNode
 
 
 class NodeWithOperatorSupport(Node, ABC):
@@ -56,12 +56,19 @@ class NodeWithOperatorSupport(Node, ABC):
     __rmod__ = __mod__
 
 
-class ReduceableBinaryOperator(BinaryOperatorNode, ABC):
+class ReducibleBinaryOperator(BinaryOperatorNode, ABC):
     def reduce(self) -> Node:
         if isinstance(self.left, Value) and isinstance(self.right, Value):
             return self.evaluate()
         else:
             return type(self)(self.left.reduce(), self.right.reduce())
+
+class CommutativeAssociativeReducibleOperatorNode(CommutativeAssociativeOperatorNode, ABC):
+    def reduce(self) -> Node:
+        if all(isinstance(c, Value) for c in self.childs):
+            return self.evaluate()
+        else:
+            return type(self)(*(c.reduce() for c in self.childs))
 
 
 class FunctionNode(NodeWithOperatorSupport, ABC):
@@ -157,15 +164,15 @@ class Variable(NodeWithOperatorSupport):
         return self.name == pattern.name
 
 
-class Add(ReduceableBinaryOperator, NodeWithOperatorSupport):
+class Add(CommutativeAssociativeReducibleOperatorNode, NodeWithOperatorSupport):
     def evaluate(self) -> Value:
-        return Value(self.left.evaluate().value + self.right.evaluate().value)
+        return Value(sum(c.evaluate().value for c in self.childs))
 
     def __repr__(self) -> str:
-        return f"({repr(self.left)} + {repr(self.right)})"
+        return ' + '.join(map(repr, self.childs))
 
 
-class Sub(ReduceableBinaryOperator, NodeWithOperatorSupport):
+class Sub(ReducibleBinaryOperator, NodeWithOperatorSupport):
     def evaluate(self) -> Value:
         return Value(self.left.evaluate().value - self.right.evaluate().value)
 
@@ -173,15 +180,18 @@ class Sub(ReduceableBinaryOperator, NodeWithOperatorSupport):
         return f"({repr(self.left)} - {repr(self.right)})"
 
 
-class Mul(ReduceableBinaryOperator, NodeWithOperatorSupport):
+class Mul(CommutativeAssociativeReducibleOperatorNode, NodeWithOperatorSupport):
     def evaluate(self) -> Value:
-        return Value(self.left.evaluate().value * self.right.evaluate().value)
+        result = 1
+        for c in self.childs:
+            result *= c.evaluate().value
+        return Value(result)
 
     def __repr__(self) -> str:
-        return f"({repr(self.left)} * {repr(self.right)})"
+        return ' * '.join(map(repr, self.childs))
 
 
-class Div(ReduceableBinaryOperator, NodeWithOperatorSupport):
+class Div(ReducibleBinaryOperator, NodeWithOperatorSupport):
     def evaluate(self) -> Value:
         left = self.left.evaluate().value
         right = self.right.evaluate().value
@@ -193,7 +203,7 @@ class Div(ReduceableBinaryOperator, NodeWithOperatorSupport):
         return f"({repr(self.left)} / {repr(self.right)})"
 
 
-class Pow(ReduceableBinaryOperator, NodeWithOperatorSupport):
+class Pow(ReducibleBinaryOperator, NodeWithOperatorSupport):
     def evaluate(self) -> Value:
         return Value(self.left.evaluate().value ** self.right.evaluate().value)
 
@@ -201,7 +211,7 @@ class Pow(ReduceableBinaryOperator, NodeWithOperatorSupport):
         return f"({repr(self.left)} ** {repr(self.right)})"
 
 
-class Mod(ReduceableBinaryOperator, NodeWithOperatorSupport):
+class Mod(ReducibleBinaryOperator, NodeWithOperatorSupport):
     def evaluate(self) -> Value:
         return Value(self.left.evaluate().value % self.right.evaluate().value)
 
